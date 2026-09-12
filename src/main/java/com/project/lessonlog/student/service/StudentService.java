@@ -9,4 +9,6 @@ public interface StudentService {
     List<Student> getAllStudents();
 
     Student registerStudent(String name, String instrument, String phone, String memo);
+
+    void deleteStudent(Long studentId);
 }
