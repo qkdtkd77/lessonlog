@@ -26,4 +26,10 @@ public class StudentRepositoryImpl implements StudentRepository {
     public List<Student> findAll() {
         return studentMap.values().stream().toList();
     }
+
+    @Override
+    public boolean delete(Long id) {
+        Student removeStudent = studentMap.remove(id);
+        return removeStudent != null;
+    }
 }

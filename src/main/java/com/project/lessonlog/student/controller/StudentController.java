@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api")
@@ -32,5 +33,15 @@ public class StudentController {
 
         Student savedStudent = studentService.registerStudent(name, instrument, phone, memo);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedStudent);
+    }
+
+    @DeleteMapping("/students/{studentId}")
+    public ResponseEntity<String> deleteStudent(@PathVariable Long studentId) {
+        try {
+            studentService.deleteStudent(studentId);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 }

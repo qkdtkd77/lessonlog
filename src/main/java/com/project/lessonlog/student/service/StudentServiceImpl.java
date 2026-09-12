@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -21,5 +22,13 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public Student registerStudent(String name, String instrument, String phone, String memo) {
         return studentRepository.save(new Student(name, instrument, phone, memo));
+    }
+
+    @Override
+    public void deleteStudent(Long studentId) {
+        boolean deleted = studentRepository.delete(studentId);
+        if (!deleted) {
+            throw new NoSuchElementException("Student not found");
+        }
     }
 }
