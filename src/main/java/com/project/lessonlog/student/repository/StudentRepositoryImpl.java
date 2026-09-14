@@ -38,4 +38,13 @@ public class StudentRepositoryImpl implements StudentRepository {
     public Optional<Student> findById(Long id) {
         return Optional.ofNullable(studentMap.get(id));
     }
+
+    @Override
+    public Optional<Student> update(Long id, Student student) {
+        if (studentMap.containsKey(id)) {
+            student.setId(id);
+            studentMap.put(id, student);
+            return Optional.of(student);
+        } else return Optional.empty();
+    }
 }

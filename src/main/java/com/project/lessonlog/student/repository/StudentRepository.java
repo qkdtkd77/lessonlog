@@ -13,4 +13,6 @@ public interface StudentRepository {
     boolean delete(Long id);
 
     Optional<Student> findById(Long id);
+
+    Optional<Student> update(Long id, Student student);
 }
