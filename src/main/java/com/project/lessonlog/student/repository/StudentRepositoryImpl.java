@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
@@ -31,5 +32,10 @@ public class StudentRepositoryImpl implements StudentRepository {
     public boolean delete(Long id) {
         Student removeStudent = studentMap.remove(id);
         return removeStudent != null;
+    }
+
+    @Override
+    public Optional<Student> findById(Long id) {
+        return Optional.ofNullable(studentMap.get(id));
     }
 }

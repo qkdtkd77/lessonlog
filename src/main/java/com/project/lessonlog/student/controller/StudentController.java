@@ -12,19 +12,19 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/students")
 @RequiredArgsConstructor
 public class StudentController {
 
     private final StudentService studentService;
 
-    @GetMapping("/students")
+    @GetMapping
     public ResponseEntity<List<Student>> getStudent() {
         List<Student> allStudents = studentService.getAllStudents();
         return ResponseEntity.status(HttpStatus.OK).body(allStudents);
     }
 
-    @PostMapping("/students")
+    @PostMapping
     public ResponseEntity<Student> registerStudent(@RequestBody Map<String, String> request) {
         String name = request.get("name");
         String instrument = request.get("instrument");
@@ -35,13 +35,23 @@ public class StudentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedStudent);
     }
 
-    @DeleteMapping("/students/{studentId}")
+    @DeleteMapping("/{studentId}")
     public ResponseEntity<String> deleteStudent(@PathVariable Long studentId) {
         try {
             studentService.deleteStudent(studentId);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/{studentId}")
+    public ResponseEntity<Student> getStudentById(@PathVariable Long studentId) {
+        try {
+            Student studentById = studentService.getStudentById(studentId);
+            return ResponseEntity.ok().body(studentById);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }
