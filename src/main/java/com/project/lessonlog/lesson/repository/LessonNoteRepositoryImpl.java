@@ -3,15 +3,15 @@ package com.project.lessonlog.lesson.repository;
 import com.project.lessonlog.lesson.domain.LessonNote;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public class LessonNoteRepositoryImpl implements LessonNoteRepository {
 
     private final AtomicLong idGenerator = new AtomicLong();
-    private final Map<Long, LessonNote> map = new HashMap<>();
+    private final Map<Long, LessonNote> map = new ConcurrentHashMap<>();
 
     @Override
     public LessonNote save(LessonNote lessonNote) {
