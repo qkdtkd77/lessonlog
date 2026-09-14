@@ -54,4 +54,18 @@ public class StudentController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+
+    @PutMapping("/{studentId}")
+    public ResponseEntity<Student> updateStudent(@PathVariable Long studentId, @RequestBody Map<String, String> request) {
+        String name = request.get("name");
+        String instrument = request.get("instrument");
+        String phone = request.get("phone");
+        String memo = request.get("memo");
+
+        try {
+            return ResponseEntity.ok().body(studentService.updateStudent(studentId, new Student(name, instrument, phone, memo)));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
 }
