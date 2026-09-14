@@ -17,6 +17,9 @@ public class LessonNoteServiceImpl implements LessonNoteService {
 
     @Override
     public LessonNote createLessonNote(LessonNote lessonNote) {
+        if (lessonNote.getStudentId() == null) {
+            throw new IllegalArgumentException("Student id must not be null");
+        }
         studentRepository.findById(lessonNote.getStudentId()).orElseThrow(
                 () -> new NoSuchElementException("Student with id " + lessonNote.getStudentId() + " not found"));
         return lessonNoteRepository.save(lessonNote);

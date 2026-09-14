@@ -35,8 +35,8 @@ public class LessonNoteController {
             return ResponseEntity.status(HttpStatus.CREATED).body(lessonNoteService.createLessonNote(lessonNote));
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
-        } catch (DateTimeParseException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (DateTimeParseException | IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 }
