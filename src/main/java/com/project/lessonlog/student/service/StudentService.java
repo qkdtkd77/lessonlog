@@ -11,4 +11,6 @@ public interface StudentService {
     Student registerStudent(String name, String instrument, String phone, String memo);
 
     void deleteStudent(Long studentId);
+
+    Student getStudentById(Long studentId);
 }

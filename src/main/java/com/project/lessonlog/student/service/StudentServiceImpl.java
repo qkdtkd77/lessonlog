@@ -31,4 +31,10 @@ public class StudentServiceImpl implements StudentService {
             throw new NoSuchElementException("Student not found");
         }
     }
+
+    @Override
+    public Student getStudentById(Long studentId) {
+        return studentRepository.findById(studentId).orElseThrow(
+                () -> new NoSuchElementException("Student not found"));
+    }
 }
