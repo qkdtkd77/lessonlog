@@ -10,7 +10,7 @@ import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
-public class LessonServiceImpl implements LessonService {
+public class LessonNoteServiceImpl implements LessonNoteService {
 
     private final LessonNoteRepository lessonNoteRepository;
     private final StudentRepository studentRepository;
