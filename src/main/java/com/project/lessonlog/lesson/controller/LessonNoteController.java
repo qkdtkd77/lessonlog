@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -37,6 +38,16 @@ public class LessonNoteController {
             return ResponseEntity.notFound().build();
         } catch (DateTimeParseException | IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/students/{studentId}/lessons")
+    public ResponseEntity<List<LessonNote>> getLessonNote(@PathVariable Long studentId) {
+        try {
+            List<LessonNote> lessonNotes = lessonNoteService.getLessonNotes(studentId);
+            return ResponseEntity.ok().body(lessonNotes);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
         }
     }
 }
