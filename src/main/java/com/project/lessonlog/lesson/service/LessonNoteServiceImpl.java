@@ -6,6 +6,8 @@ import com.project.lessonlog.student.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -23,5 +25,16 @@ public class LessonNoteServiceImpl implements LessonNoteService {
         studentRepository.findById(lessonNote.getStudentId()).orElseThrow(
                 () -> new NoSuchElementException("Student with id " + lessonNote.getStudentId() + " not found"));
         return lessonNoteRepository.save(lessonNote);
+    }
+
+    @Override
+    public List<LessonNote> getLessonNotes(Long studentId) {
+        studentRepository.findById(studentId).orElseThrow(
+                () -> new NoSuchElementException("Student with id " + studentId + " not found"));
+
+        return lessonNoteRepository.findByStudentId(studentId)
+                .stream()
+                .sorted(Comparator.comparing(LessonNote::getLessonDate).reversed())
+                .toList();
     }
 }
