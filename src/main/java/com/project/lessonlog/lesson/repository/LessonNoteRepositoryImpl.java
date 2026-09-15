@@ -3,6 +3,7 @@ package com.project.lessonlog.lesson.repository;
 import com.project.lessonlog.lesson.domain.LessonNote;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -19,5 +20,12 @@ public class LessonNoteRepositoryImpl implements LessonNoteRepository {
         lessonNote.setId(id);
         map.put(id, lessonNote);
         return lessonNote;
+    }
+
+    @Override
+    public List<LessonNote> findByStudentId(Long studentId) {
+        return map.values().stream()
+                .filter(lessonNote -> lessonNote.getStudentId().equals(studentId))
+                .toList();
     }
 }
