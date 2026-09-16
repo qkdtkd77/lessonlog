@@ -1,19 +1,30 @@
 package com.project.lessonlog.lesson.domain;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
 @Getter
 public class LessonNote {
-    private final String lessonContent;
-    private final String homework;
-    private final String memo;
-    private final Long studentId;
-    private final LocalDate lessonDate;
     @Setter
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String lessonContent;
+    private String homework;
+    private String memo;
+    private Long studentId;
+    private LocalDate lessonDate;
 
     public LessonNote(Long studentId, LocalDate lessonDate, String lessonContent, String homework, String memo) {
         this.studentId = studentId;
