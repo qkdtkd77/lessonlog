@@ -26,10 +26,10 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public void deleteStudent(Long studentId) {
-        boolean deleted = studentRepository.delete(studentId);
-        if (!deleted) {
-            throw new NoSuchElementException("Student not found");
-        }
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new NoSuchElementException("Student not found"));
+
+        studentRepository.delete(student);
     }
 
     @Override
@@ -40,8 +40,10 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student updateStudent(Long studentId, Student student) {
-        return studentRepository.update(studentId, student).orElseThrow(
-                () -> new NoSuchElementException("Student not found")
-        );
+        Student exists = studentRepository.findById(studentId).orElseThrow(
+                () -> new NoSuchElementException("Student not found"));
+
+        exists.updateStudent(student.getName(), student.getInstrument(), student.getPhone(), student.getMemo());
+        return studentRepository.save(exists);
     }
 }

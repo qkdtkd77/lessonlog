@@ -30,5 +30,12 @@ public class Student {
         this.phone = phone;
         this.memo = memo;
     }
+
+    public void updateStudent(String name, String instrument, String phone, String memo) {
+        this.name = name;
+        this.instrument = instrument;
+        this.phone = phone;
+        this.memo = memo;
+    }
 }
 
