@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/students")
@@ -37,23 +36,16 @@ public class StudentController {
     }
 
     @DeleteMapping("/{studentId}")
-    public ResponseEntity<String> deleteStudent(@PathVariable Long studentId) {
-        try {
-            studentService.deleteStudent(studentId);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+    public ResponseEntity<Void> deleteStudent(@PathVariable Long studentId) {
+        studentService.deleteStudent(studentId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping("/{studentId}")
     public ResponseEntity<Student> getStudentById(@PathVariable Long studentId) {
-        try {
-            Student studentById = studentService.getStudentById(studentId);
-            return ResponseEntity.ok().body(studentById);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        Student studentById = studentService.getStudentById(studentId);
+        return ResponseEntity.ok().body(studentById);
+
     }
 
     @PutMapping("/{studentId}")
@@ -63,10 +55,6 @@ public class StudentController {
         String phone = request.getPhone();
         String memo = request.getMemo();
 
-        try {
-            return ResponseEntity.ok().body(studentService.updateStudent(studentId, new Student(name, instrument, phone, memo)));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        return ResponseEntity.ok().body(studentService.updateStudent(studentId, new Student(name, instrument, phone, memo)));
     }
 }
