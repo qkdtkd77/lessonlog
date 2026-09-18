@@ -1,14 +1,15 @@
 package com.project.lessonlog.student.controller;
 
 import com.project.lessonlog.student.domain.Student;
+import com.project.lessonlog.student.dto.StudentRequest;
 import com.project.lessonlog.student.service.StudentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 @RestController
@@ -25,11 +26,11 @@ public class StudentController {
     }
 
     @PostMapping
-    public ResponseEntity<Student> registerStudent(@RequestBody Map<String, String> request) {
-        String name = request.get("name");
-        String instrument = request.get("instrument");
-        String phone = request.get("phone");
-        String memo = request.get("memo");
+    public ResponseEntity<Student> registerStudent(@Valid @RequestBody StudentRequest request) {
+        String name = request.getName();
+        String instrument = request.getInstrument();
+        String phone = request.getPhone();
+        String memo = request.getMemo();
 
         Student savedStudent = studentService.registerStudent(name, instrument, phone, memo);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedStudent);
@@ -56,11 +57,11 @@ public class StudentController {
     }
 
     @PutMapping("/{studentId}")
-    public ResponseEntity<Student> updateStudent(@PathVariable Long studentId, @RequestBody Map<String, String> request) {
-        String name = request.get("name");
-        String instrument = request.get("instrument");
-        String phone = request.get("phone");
-        String memo = request.get("memo");
+    public ResponseEntity<Student> updateStudent(@PathVariable Long studentId, @Valid @RequestBody StudentRequest request) {
+        String name = request.getName();
+        String instrument = request.getInstrument();
+        String phone = request.getPhone();
+        String memo = request.getMemo();
 
         try {
             return ResponseEntity.ok().body(studentService.updateStudent(studentId, new Student(name, instrument, phone, memo)));
