@@ -22,12 +22,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<Map<String, String>> handleNoSuchElementException(NoSuchElementException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+    public ResponseEntity<Map<String, String>> handleNoSuchElementException() {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "요청한 데이터를 찾을 수 없습니다."));
     }
 
     @ExceptionHandler({IllegalArgumentException.class, DateTimeParseException.class})
-    public ResponseEntity<Map<String, String>> handleBadRequestException(Exception e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+    public ResponseEntity<Map<String, String>> handleBadRequestException() {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "잘못된 요청입니다."));
     }
 }
