@@ -31,4 +31,11 @@ public class LessonNote {
         this.homework = homework;
         this.memo = memo;
     }
+
+    public void updateLessonNote(LocalDate lessonDate, String lessonContent, String homework, String memo) {
+        this.lessonDate = lessonDate;
+        this.lessonContent = lessonContent;
+        this.homework = homework;
+        this.memo = memo;
+    }
 }

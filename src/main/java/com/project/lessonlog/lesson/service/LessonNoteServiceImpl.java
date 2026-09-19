@@ -32,4 +32,13 @@ public class LessonNoteServiceImpl implements LessonNoteService {
 
         return lessonNoteRepository.findByStudentIdOrderByLessonDateDesc(studentId);
     }
+
+    @Override
+    public LessonNote updateLessonNote(Long lessonId, LessonNote lessonNote) {
+        LessonNote exists = lessonNoteRepository.findById(lessonId).orElseThrow(
+                () -> new NoSuchElementException("Lesson with id " + lessonId + " not found"));
+        exists.updateLessonNote(lessonNote.getLessonDate(), lessonNote.getLessonContent(), lessonNote.getHomework(), lessonNote.getMemo());
+
+        return lessonNoteRepository.save(exists);
+    }
 }
