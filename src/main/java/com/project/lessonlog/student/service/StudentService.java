@@ -1,18 +1,18 @@
 package com.project.lessonlog.student.service;
 
-import com.project.lessonlog.student.domain.Student;
+import com.project.lessonlog.student.dto.StudentDto;
 
 import java.util.List;
 
 public interface StudentService {
 
-    List<Student> getAllStudents();
+    List<StudentDto> getAllStudents();
 
-    Student registerStudent(String name, String instrument, String phone, String memo);
+    StudentDto registerStudent(String name, String instrument, String phone, String memo);
 
     void deleteStudent(Long studentId);
 
-    Student getStudentById(Long studentId);
+    StudentDto getStudentById(Long studentId);
 
-    Student updateStudent(Long studentId, Student student);
+    StudentDto updateStudent(Long studentId, StudentDto studentDto);
 }
