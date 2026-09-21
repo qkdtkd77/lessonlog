@@ -1,13 +1,13 @@
 package com.project.lessonlog.lesson.service;
 
-import com.project.lessonlog.lesson.domain.LessonNote;
+import com.project.lessonlog.lesson.dto.LessonNoteDto;
 
 import java.util.List;
 
 public interface LessonNoteService {
-    LessonNote createLessonNote(LessonNote lessonNote);
+    LessonNoteDto createLessonNote(LessonNoteDto lessonNoteDto);
 
-    List<LessonNote> getLessonNotes(Long lessonId);
+    List<LessonNoteDto> getLessonNotes(Long studentId);
 
-    LessonNote updateLessonNote(Long lessonId, LessonNote lessonNote);
+    LessonNoteDto updateLessonNote(Long lessonId, LessonNoteDto lessonNoteDto);
 }

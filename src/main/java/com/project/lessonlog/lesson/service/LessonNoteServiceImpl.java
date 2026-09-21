@@ -4,6 +4,7 @@ import com.project.lessonlog.exception.LessonNoteNotFoundException;
 import com.project.lessonlog.exception.StudentIdRequiredException;
 import com.project.lessonlog.exception.StudentNotFoundException;
 import com.project.lessonlog.lesson.domain.LessonNote;
+import com.project.lessonlog.lesson.dto.LessonNoteDto;
 import com.project.lessonlog.lesson.repository.LessonNoteRepository;
 import com.project.lessonlog.student.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,29 +19,42 @@ public class LessonNoteServiceImpl implements LessonNoteService {
     private final StudentRepository studentRepository;
 
     @Override
-    public LessonNote createLessonNote(LessonNote lessonNote) {
-        if (lessonNote.getStudentId() == null) {
+    public LessonNoteDto createLessonNote(LessonNoteDto lessonNoteDto) {
+        if (lessonNoteDto.getStudentId() == null) {
             throw new StudentIdRequiredException();
         }
-        studentRepository.findById(lessonNote.getStudentId()).orElseThrow(
-                () -> new StudentNotFoundException(lessonNote.getStudentId()));
-        return lessonNoteRepository.save(lessonNote);
+        studentRepository.findById(lessonNoteDto.getStudentId()).orElseThrow(
+                () -> new StudentNotFoundException(lessonNoteDto.getStudentId()));
+
+        LessonNote lessonNote = new LessonNote(
+                lessonNoteDto.getStudentId(),
+                lessonNoteDto.getLessonContent(),
+                lessonNoteDto.getHomework(),
+                lessonNoteDto.getMemo(),
+                lessonNoteDto.getLessonDate());
+        LessonNote saved = lessonNoteRepository.save(lessonNote);
+
+        return LessonNoteDto.from(saved);
     }
 
     @Override
-    public List<LessonNote> getLessonNotes(Long studentId) {
+    public List<LessonNoteDto> getLessonNotes(Long studentId) {
         studentRepository.findById(studentId).orElseThrow(
                 () -> new StudentNotFoundException(studentId));
 
-        return lessonNoteRepository.findByStudentIdOrderByLessonDateDesc(studentId);
+        return lessonNoteRepository.findByStudentIdOrderByLessonDateDesc(studentId)
+                .stream()
+                .map(LessonNoteDto::from)
+                .toList();
     }
 
     @Override
-    public LessonNote updateLessonNote(Long lessonId, LessonNote lessonNote) {
+    public LessonNoteDto updateLessonNote(Long lessonId, LessonNoteDto lessonNote) {
         LessonNote exists = lessonNoteRepository.findById(lessonId).orElseThrow(
                 () -> new LessonNoteNotFoundException(lessonId));
-        exists.updateLessonNote(lessonNote.getLessonDate(), lessonNote.getLessonContent(), lessonNote.getHomework(), lessonNote.getMemo());
 
-        return lessonNoteRepository.save(exists);
+        exists.updateLessonNote(lessonNote.getLessonContent(), lessonNote.getHomework(), lessonNote.getMemo(), lessonNote.getLessonDate());
+        LessonNote saved = lessonNoteRepository.save(exists);
+        return LessonNoteDto.from(saved);
     }
 }
