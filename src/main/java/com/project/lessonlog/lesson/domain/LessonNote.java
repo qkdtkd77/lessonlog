@@ -18,13 +18,13 @@ public class LessonNote {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Long studentId;
     private String lessonContent;
     private String homework;
     private String memo;
-    private Long studentId;
     private LocalDate lessonDate;
 
-    public LessonNote(Long studentId, LocalDate lessonDate, String lessonContent, String homework, String memo) {
+    public LessonNote(Long studentId, String lessonContent, String homework, String memo, LocalDate lessonDate) {
         this.studentId = studentId;
         this.lessonDate = lessonDate;
         this.lessonContent = lessonContent;
@@ -32,7 +32,7 @@ public class LessonNote {
         this.memo = memo;
     }
 
-    public void updateLessonNote(LocalDate lessonDate, String lessonContent, String homework, String memo) {
+    public void updateLessonNote(String lessonContent, String homework, String memo, LocalDate lessonDate) {
         this.lessonDate = lessonDate;
         this.lessonContent = lessonContent;
         this.homework = homework;

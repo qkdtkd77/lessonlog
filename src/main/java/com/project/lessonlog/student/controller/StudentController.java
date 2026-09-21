@@ -1,7 +1,8 @@
 package com.project.lessonlog.student.controller;
 
-import com.project.lessonlog.student.domain.Student;
+import com.project.lessonlog.student.dto.StudentDto;
 import com.project.lessonlog.student.dto.StudentRequest;
+import com.project.lessonlog.student.dto.StudentResponse;
 import com.project.lessonlog.student.service.StudentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,20 +20,16 @@ public class StudentController {
     private final StudentService studentService;
 
     @GetMapping
-    public ResponseEntity<List<Student>> getStudent() {
-        List<Student> allStudents = studentService.getAllStudents();
-        return ResponseEntity.status(HttpStatus.OK).body(allStudents);
+    public ResponseEntity<StudentResponse<List<StudentDto>>> getStudent() {
+        List<StudentDto> allStudents = studentService.getAllStudents();
+        return ResponseEntity.status(HttpStatus.OK).body(new StudentResponse<>(allStudents));
     }
 
     @PostMapping
-    public ResponseEntity<Student> registerStudent(@Valid @RequestBody StudentRequest request) {
-        String name = request.getName();
-        String instrument = request.getInstrument();
-        String phone = request.getPhone();
-        String memo = request.getMemo();
-
-        Student savedStudent = studentService.registerStudent(name, instrument, phone, memo);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedStudent);
+    public ResponseEntity<StudentResponse<StudentDto>> registerStudent(@Valid @RequestBody StudentRequest request) {
+        StudentDto savedStudent = studentService.registerStudent(
+                request.getName(), request.getInstrument(), request.getPhone(), request.getMemo());
+        return ResponseEntity.status(HttpStatus.CREATED).body(new StudentResponse<>(savedStudent));
     }
 
     @DeleteMapping("/{studentId}")
@@ -42,19 +39,15 @@ public class StudentController {
     }
 
     @GetMapping("/{studentId}")
-    public ResponseEntity<Student> getStudentById(@PathVariable Long studentId) {
-        Student studentById = studentService.getStudentById(studentId);
-        return ResponseEntity.ok().body(studentById);
-
+    public ResponseEntity<StudentResponse<StudentDto>> getStudentById(@PathVariable Long studentId) {
+        StudentDto studentById = studentService.getStudentById(studentId);
+        return ResponseEntity.ok().body(new StudentResponse<>(studentById));
     }
 
     @PutMapping("/{studentId}")
-    public ResponseEntity<Student> updateStudent(@PathVariable Long studentId, @Valid @RequestBody StudentRequest request) {
-        String name = request.getName();
-        String instrument = request.getInstrument();
-        String phone = request.getPhone();
-        String memo = request.getMemo();
-
-        return ResponseEntity.ok().body(studentService.updateStudent(studentId, new Student(name, instrument, phone, memo)));
+    public ResponseEntity<StudentResponse<StudentDto>> updateStudent(@PathVariable Long studentId, @Valid @RequestBody StudentRequest request) {
+        StudentDto updatedStudent = studentService.updateStudent(studentId,
+                new StudentDto(null, request.getName(), request.getInstrument(), request.getPhone(), request.getMemo()));
+        return ResponseEntity.ok().body(new StudentResponse<>(updatedStudent));
     }
 }

@@ -2,6 +2,7 @@ package com.project.lessonlog.student.service;
 
 import com.project.lessonlog.exception.StudentNotFoundException;
 import com.project.lessonlog.student.domain.Student;
+import com.project.lessonlog.student.dto.StudentDto;
 import com.project.lessonlog.student.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,13 +16,17 @@ public class StudentServiceImpl implements StudentService {
     private final StudentRepository studentRepository;
 
     @Override
-    public List<Student> getAllStudents() {
-        return studentRepository.findAll();
+    public List<StudentDto> getAllStudents() {
+        return studentRepository.findAll().stream()
+                .map(StudentDto::from)
+                .toList();
     }
 
     @Override
-    public Student registerStudent(String name, String instrument, String phone, String memo) {
-        return studentRepository.save(new Student(name, instrument, phone, memo));
+    public StudentDto registerStudent(String name, String instrument, String phone, String memo) {
+        Student student = new Student(name, instrument, phone, memo);
+        Student saved = studentRepository.save(student);
+        return StudentDto.from(saved);
     }
 
     @Override
@@ -33,17 +38,19 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Student getStudentById(Long studentId) {
-        return studentRepository.findById(studentId).orElseThrow(
+    public StudentDto getStudentById(Long studentId) {
+        Student student = studentRepository.findById(studentId).orElseThrow(
                 () -> new StudentNotFoundException(studentId));
+        return StudentDto.from(student);
     }
 
     @Override
-    public Student updateStudent(Long studentId, Student student) {
+    public StudentDto updateStudent(Long studentId, StudentDto studentDto) {
         Student exists = studentRepository.findById(studentId).orElseThrow(
                 () -> new StudentNotFoundException(studentId));
 
-        exists.updateStudent(student.getName(), student.getInstrument(), student.getPhone(), student.getMemo());
-        return studentRepository.save(exists);
+        exists.updateStudent(studentDto.getName(), studentDto.getInstrument(), studentDto.getPhone(), studentDto.getMemo());
+        Student updated = studentRepository.save(exists);
+        return StudentDto.from(updated);
     }
 }
