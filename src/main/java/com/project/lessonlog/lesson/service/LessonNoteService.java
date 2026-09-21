@@ -8,4 +8,6 @@ public interface LessonNoteService {
     LessonNote createLessonNote(LessonNote lessonNote);
 
     List<LessonNote> getLessonNotes(Long lessonId);
+
+    LessonNote updateLessonNote(Long lessonId, LessonNote lessonNote);
 }

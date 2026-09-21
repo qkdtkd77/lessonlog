@@ -36,4 +36,15 @@ public class LessonNoteController {
         List<LessonNote> lessonNotes = lessonNoteService.getLessonNotes(studentId);
         return ResponseEntity.ok().body(lessonNotes);
     }
+
+    @PutMapping("/lessons/{lessonId}")
+    public ResponseEntity<LessonNote> updateLessonNote(@PathVariable Long lessonId, @Valid @RequestBody LessonNoteRequest request) {
+        LocalDate lessonDate = request.getLessonDate();
+        String lessonContent = request.getLessonContent();
+        String homework = request.getHomework();
+        String memo = request.getMemo();
+
+        LessonNote updatedLessonNote = lessonNoteService.updateLessonNote(lessonId, new LessonNote(null, lessonDate, lessonContent, homework, memo));
+        return ResponseEntity.ok().body(updatedLessonNote);
+    }
 }
