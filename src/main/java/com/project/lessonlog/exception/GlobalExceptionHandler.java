@@ -21,7 +21,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(StudentIdRequiredException.class)
     public ResponseEntity<Map<String, List<String>>> handleStudentIdRequiredException(StudentIdRequiredException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("errors", List.of(e.getMessage())));
+        return ResponseEntity.badRequest().body(Map.of("errors", List.of(e.getMessage())));
     }
 
     @ExceptionHandler(StudentNotFoundException.class)
@@ -32,5 +32,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(LessonNoteNotFoundException.class)
     public ResponseEntity<Map<String, List<String>>> handleLessonNoteNotFoundException(LessonNoteNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("errors", List.of(e.getMessage())));
+    }
+
+    @ExceptionHandler(InvalidPaginationException.class)
+    public ResponseEntity<Map<String, List<String>>> handleInvalidPaginationException(InvalidPaginationException e) {
+        return ResponseEntity.badRequest().body(Map.of("errors", List.of(e.getMessage())));
     }
 }

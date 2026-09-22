@@ -1,5 +1,7 @@
 package com.project.lessonlog.student.controller;
 
+import com.project.lessonlog.common.PageResponse;
+import com.project.lessonlog.student.config.AppConstant;
 import com.project.lessonlog.student.dto.StudentDto;
 import com.project.lessonlog.student.dto.StudentRequest;
 import com.project.lessonlog.student.dto.StudentResponse;
@@ -20,9 +22,15 @@ public class StudentController {
     private final StudentService studentService;
 
     @GetMapping
-    public ResponseEntity<StudentResponse<List<StudentDto>>> getStudent() {
-        List<StudentDto> allStudents = studentService.getAllStudents();
-        return ResponseEntity.status(HttpStatus.OK).body(new StudentResponse<>(allStudents));
+    public ResponseEntity<PageResponse<List<StudentDto>>> getStudent(
+            @RequestParam(value = "pageNumber", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER) Integer pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
+            @RequestParam(value = "sortBy", defaultValue = AppConstant.SORT_STUDENT_BY) String sortBy,
+            @RequestParam(value = "sortOrder", defaultValue = AppConstant.SORT_STUDENT_ASC) String sortOrder
+    ) {
+
+        PageResponse<List<StudentDto>> allStudents = studentService.getAllStudents(pageNumber, pageSize, sortBy, sortOrder);
+        return ResponseEntity.ok().body(allStudents);
     }
 
     @PostMapping
