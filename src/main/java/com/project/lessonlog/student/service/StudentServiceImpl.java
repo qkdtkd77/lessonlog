@@ -3,6 +3,7 @@ package com.project.lessonlog.student.service;
 import com.project.lessonlog.exception.StudentNotFoundException;
 import com.project.lessonlog.student.domain.Student;
 import com.project.lessonlog.student.dto.StudentDto;
+import com.project.lessonlog.student.mapper.StudentMapper;
 import com.project.lessonlog.student.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,19 +15,17 @@ import java.util.List;
 public class StudentServiceImpl implements StudentService {
 
     private final StudentRepository studentRepository;
+    private final StudentMapper studentMapper;
 
     @Override
     public List<StudentDto> getAllStudents() {
-        return studentRepository.findAll().stream()
-                .map(StudentDto::from)
-                .toList();
+        List<Student> students = studentRepository.findAll();
+        return studentMapper.toStudentDtoList(students);
     }
 
     @Override
     public StudentDto registerStudent(String name, String instrument, String phone, String memo) {
-        Student student = new Student(name, instrument, phone, memo);
-        Student saved = studentRepository.save(student);
-        return StudentDto.from(saved);
+        return studentMapper.toStudentDto(studentRepository.save(new Student(name, instrument, phone, memo)));
     }
 
     @Override
@@ -41,7 +40,7 @@ public class StudentServiceImpl implements StudentService {
     public StudentDto getStudentById(Long studentId) {
         Student student = studentRepository.findById(studentId).orElseThrow(
                 () -> new StudentNotFoundException(studentId));
-        return StudentDto.from(student);
+        return studentMapper.toStudentDto(student);
     }
 
     @Override
@@ -51,6 +50,6 @@ public class StudentServiceImpl implements StudentService {
 
         exists.updateStudent(studentDto.getName(), studentDto.getInstrument(), studentDto.getPhone(), studentDto.getMemo());
         Student updated = studentRepository.save(exists);
-        return StudentDto.from(updated);
+        return studentMapper.toStudentDto(updated);
     }
 }
