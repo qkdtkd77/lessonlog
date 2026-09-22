@@ -5,6 +5,7 @@ import com.project.lessonlog.exception.StudentIdRequiredException;
 import com.project.lessonlog.exception.StudentNotFoundException;
 import com.project.lessonlog.lesson.domain.LessonNote;
 import com.project.lessonlog.lesson.dto.LessonNoteDto;
+import com.project.lessonlog.lesson.mapper.LessonNoteMapper;
 import com.project.lessonlog.lesson.repository.LessonNoteRepository;
 import com.project.lessonlog.student.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +16,10 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class LessonNoteServiceImpl implements LessonNoteService {
+
     private final LessonNoteRepository lessonNoteRepository;
     private final StudentRepository studentRepository;
+    private final LessonNoteMapper lessonNoteMapper;
 
     @Override
     public LessonNoteDto createLessonNote(LessonNoteDto lessonNoteDto) {
@@ -32,9 +35,10 @@ public class LessonNoteServiceImpl implements LessonNoteService {
                 lessonNoteDto.getHomework(),
                 lessonNoteDto.getMemo(),
                 lessonNoteDto.getLessonDate());
+
         LessonNote saved = lessonNoteRepository.save(lessonNote);
 
-        return LessonNoteDto.from(saved);
+        return lessonNoteMapper.toDto(saved);
     }
 
     @Override
@@ -42,10 +46,8 @@ public class LessonNoteServiceImpl implements LessonNoteService {
         studentRepository.findById(studentId).orElseThrow(
                 () -> new StudentNotFoundException(studentId));
 
-        return lessonNoteRepository.findByStudentIdOrderByLessonDateDesc(studentId)
-                .stream()
-                .map(LessonNoteDto::from)
-                .toList();
+        List<LessonNote> lessonNotes = lessonNoteRepository.findByStudentIdOrderByLessonDateDesc(studentId);
+        return lessonNoteMapper.toDtoList(lessonNotes);
     }
 
     @Override
@@ -55,6 +57,7 @@ public class LessonNoteServiceImpl implements LessonNoteService {
 
         exists.updateLessonNote(lessonNote.getLessonContent(), lessonNote.getHomework(), lessonNote.getMemo(), lessonNote.getLessonDate());
         LessonNote saved = lessonNoteRepository.save(exists);
-        return LessonNoteDto.from(saved);
+
+        return lessonNoteMapper.toDto(saved);
     }
 }
