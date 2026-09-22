@@ -1,5 +1,7 @@
 package com.project.lessonlog.lesson.controller;
 
+import com.project.lessonlog.common.PageResponse;
+import com.project.lessonlog.lesson.config.AppConstant;
 import com.project.lessonlog.lesson.dto.LessonNoteDto;
 import com.project.lessonlog.lesson.dto.LessonNoteRequest;
 import com.project.lessonlog.lesson.dto.LessonNoteResponse;
@@ -27,9 +29,17 @@ public class LessonNoteController {
     }
 
     @GetMapping("/students/{studentId}/lessons")
-    public ResponseEntity<LessonNoteResponse<List<LessonNoteDto>>> getLessonNote(@PathVariable Long studentId) {
-        List<LessonNoteDto> lessonNotes = lessonNoteService.getLessonNotes(studentId);
-        return ResponseEntity.status(HttpStatus.OK).body(new LessonNoteResponse<>(lessonNotes));
+    public ResponseEntity<PageResponse<List<LessonNoteDto>>> getLessonNote(
+            @PathVariable Long studentId,
+            @RequestParam(value = "pageNumber", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER) Integer pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
+            @RequestParam(value = "sortBy", defaultValue = AppConstant.SORT_LESSON_NOTE_BY) String sortBy,
+            @RequestParam(value = "sortOrder", defaultValue = AppConstant.SORT_LESSON_NOTE_DESC) String sortOrder
+    ) {
+
+
+        PageResponse<List<LessonNoteDto>> lessonNotes = lessonNoteService.getLessonNotes(studentId, pageNumber, pageSize, sortBy, sortOrder);
+        return ResponseEntity.ok().body(lessonNotes);
     }
 
     @PutMapping("/lessons/{lessonId}")

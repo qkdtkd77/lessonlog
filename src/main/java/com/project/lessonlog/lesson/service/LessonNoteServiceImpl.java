@@ -1,5 +1,6 @@
 package com.project.lessonlog.lesson.service;
 
+import com.project.lessonlog.common.PageResponse;
 import com.project.lessonlog.exception.LessonNoteNotFoundException;
 import com.project.lessonlog.exception.StudentIdRequiredException;
 import com.project.lessonlog.exception.StudentNotFoundException;
@@ -9,6 +10,10 @@ import com.project.lessonlog.lesson.mapper.LessonNoteMapper;
 import com.project.lessonlog.lesson.repository.LessonNoteRepository;
 import com.project.lessonlog.student.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,12 +47,26 @@ public class LessonNoteServiceImpl implements LessonNoteService {
     }
 
     @Override
-    public List<LessonNoteDto> getLessonNotes(Long studentId) {
+    public PageResponse<List<LessonNoteDto>> getLessonNotes(Long studentId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         studentRepository.findById(studentId).orElseThrow(
                 () -> new StudentNotFoundException(studentId));
 
-        List<LessonNote> lessonNotes = lessonNoteRepository.findByStudentIdOrderByLessonDateDesc(studentId);
-        return lessonNoteMapper.toDtoList(lessonNotes);
+        Sort sort = Sort.by(sortOrder.equalsIgnoreCase("desc")
+                        ? Sort.Direction.DESC
+                        : Sort.Direction.ASC,
+                sortBy);
+
+        Pageable pageDetails = PageRequest.of(pageNumber - 1, pageSize, sort);
+        Page<LessonNote> lessonNotePage = lessonNoteRepository.findByStudentId(studentId, pageDetails);
+        List<LessonNote> lessonNotes = lessonNotePage.getContent();
+
+        return new PageResponse<>(lessonNoteMapper.toDtoList(lessonNotes),
+                lessonNotePage.getNumber() + 1,
+                lessonNotePage.getSize(),
+                lessonNotePage.getTotalElements(),
+                lessonNotePage.getTotalPages(),
+                lessonNotePage.isLast()
+        );
     }
 
     @Override

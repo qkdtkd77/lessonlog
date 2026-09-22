@@ -1,12 +1,13 @@
 package com.project.lessonlog.student.service;
 
+import com.project.lessonlog.common.PageResponse;
 import com.project.lessonlog.student.dto.StudentDto;
 
 import java.util.List;
 
 public interface StudentService {
 
-    List<StudentDto> getAllStudents();
+    PageResponse<List<StudentDto>> getAllStudents(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 
     StudentDto registerStudent(String name, String instrument, String phone, String memo);
 
