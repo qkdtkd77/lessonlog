@@ -1,6 +1,7 @@
 package com.project.lessonlog.student.service;
 
 import com.project.lessonlog.common.PageResponse;
+import com.project.lessonlog.common.PaginationValidator;
 import com.project.lessonlog.exception.StudentNotFoundException;
 import com.project.lessonlog.student.domain.Student;
 import com.project.lessonlog.student.dto.StudentDto;
@@ -24,6 +25,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public PageResponse<List<StudentDto>> getAllStudents(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+        PaginationValidator.validate(pageNumber, pageSize, sortBy, sortOrder, List.of("id", "name"));
         Sort sort = Sort.by(
                 sortOrder.equalsIgnoreCase("asc")
                         ? Sort.Direction.ASC

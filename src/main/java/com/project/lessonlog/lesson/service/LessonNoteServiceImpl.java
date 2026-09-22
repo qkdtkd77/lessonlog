@@ -1,6 +1,7 @@
 package com.project.lessonlog.lesson.service;
 
 import com.project.lessonlog.common.PageResponse;
+import com.project.lessonlog.common.PaginationValidator;
 import com.project.lessonlog.exception.LessonNoteNotFoundException;
 import com.project.lessonlog.exception.StudentIdRequiredException;
 import com.project.lessonlog.exception.StudentNotFoundException;
@@ -48,9 +49,11 @@ public class LessonNoteServiceImpl implements LessonNoteService {
 
     @Override
     public PageResponse<List<LessonNoteDto>> getLessonNotes(Long studentId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+        PaginationValidator.validate(pageNumber, pageSize, sortBy, sortOrder, List.of("lessonDate"));
+
         studentRepository.findById(studentId).orElseThrow(
                 () -> new StudentNotFoundException(studentId));
-
+        
         Sort sort = Sort.by(sortOrder.equalsIgnoreCase("desc")
                         ? Sort.Direction.DESC
                         : Sort.Direction.ASC,
