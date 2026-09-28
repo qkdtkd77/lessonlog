@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface LessonNoteRepository extends JpaRepository<LessonNote, Long> {
     Page<LessonNote> findByStudent_Id(Long studentId, Pageable pageable);
+
+    void deleteByStudent_Id(Long studentId);
 }
