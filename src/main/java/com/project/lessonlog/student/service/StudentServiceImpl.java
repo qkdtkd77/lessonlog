@@ -3,6 +3,7 @@ package com.project.lessonlog.student.service;
 import com.project.lessonlog.common.PageResponse;
 import com.project.lessonlog.common.PaginationValidator;
 import com.project.lessonlog.exception.StudentNotFoundException;
+import com.project.lessonlog.lesson.repository.LessonNoteRepository;
 import com.project.lessonlog.student.domain.Student;
 import com.project.lessonlog.student.dto.StudentDto;
 import com.project.lessonlog.student.mapper.StudentMapper;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,6 +23,7 @@ import java.util.List;
 public class StudentServiceImpl implements StudentService {
 
     private final StudentRepository studentRepository;
+    private final LessonNoteRepository lessonNoteRepository;
     private final StudentMapper studentMapper;
 
     @Override
@@ -46,10 +49,12 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
+    @Transactional
     public void deleteStudent(Long studentId) {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new StudentNotFoundException(studentId));
 
+        lessonNoteRepository.deleteByStudent_Id(studentId);
         studentRepository.delete(student);
     }
 
@@ -61,12 +66,12 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
+    @Transactional
     public StudentDto updateStudent(Long studentId, StudentDto studentDto) {
         Student exists = studentRepository.findById(studentId).orElseThrow(
                 () -> new StudentNotFoundException(studentId));
 
         exists.updateStudent(studentDto.getName(), studentDto.getInstrument(), studentDto.getPhone(), studentDto.getMemo());
-        Student updated = studentRepository.save(exists);
-        return studentMapper.toStudentDto(updated);
+        return studentMapper.toStudentDto(exists);
     }
 }
