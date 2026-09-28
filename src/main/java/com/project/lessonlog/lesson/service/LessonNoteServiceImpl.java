@@ -9,6 +9,7 @@ import com.project.lessonlog.lesson.domain.LessonNote;
 import com.project.lessonlog.lesson.dto.LessonNoteDto;
 import com.project.lessonlog.lesson.mapper.LessonNoteMapper;
 import com.project.lessonlog.lesson.repository.LessonNoteRepository;
+import com.project.lessonlog.student.domain.Student;
 import com.project.lessonlog.student.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,16 +33,10 @@ public class LessonNoteServiceImpl implements LessonNoteService {
         if (lessonNoteDto.getStudentId() == null) {
             throw new StudentIdRequiredException();
         }
-        studentRepository.findById(lessonNoteDto.getStudentId()).orElseThrow(
+        Student student = studentRepository.findById(lessonNoteDto.getStudentId()).orElseThrow(
                 () -> new StudentNotFoundException(lessonNoteDto.getStudentId()));
 
-        LessonNote lessonNote = new LessonNote(
-                lessonNoteDto.getStudentId(),
-                lessonNoteDto.getLessonContent(),
-                lessonNoteDto.getHomework(),
-                lessonNoteDto.getMemo(),
-                lessonNoteDto.getLessonDate());
-
+        LessonNote lessonNote = lessonNoteMapper.toEntity(student, lessonNoteDto);
         LessonNote saved = lessonNoteRepository.save(lessonNote);
 
         return lessonNoteMapper.toDto(saved);
@@ -53,23 +48,17 @@ public class LessonNoteServiceImpl implements LessonNoteService {
 
         studentRepository.findById(studentId).orElseThrow(
                 () -> new StudentNotFoundException(studentId));
-        
+
         Sort sort = Sort.by(sortOrder.equalsIgnoreCase("desc")
                         ? Sort.Direction.DESC
                         : Sort.Direction.ASC,
                 sortBy);
 
         Pageable pageDetails = PageRequest.of(pageNumber - 1, pageSize, sort);
-        Page<LessonNote> lessonNotePage = lessonNoteRepository.findByStudentId(studentId, pageDetails);
+        Page<LessonNote> lessonNotePage = lessonNoteRepository.findByStudent_Id(studentId, pageDetails);
         List<LessonNote> lessonNotes = lessonNotePage.getContent();
 
-        return new PageResponse<>(lessonNoteMapper.toDtoList(lessonNotes),
-                lessonNotePage.getNumber() + 1,
-                lessonNotePage.getSize(),
-                lessonNotePage.getTotalElements(),
-                lessonNotePage.getTotalPages(),
-                lessonNotePage.isLast()
-        );
+        return PageResponse.of(lessonNoteMapper.toDtoList(lessonNotes), lessonNotePage);
     }
 
     @Override
