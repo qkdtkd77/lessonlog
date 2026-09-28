@@ -1,9 +1,7 @@
 package com.project.lessonlog.lesson.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.project.lessonlog.student.domain.Student;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,14 +16,17 @@ public class LessonNote {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long studentId;
+    @ManyToOne
+    @JoinColumn(name = "student_id", nullable = false)
+    private Student student;
+
     private String lessonContent;
     private String homework;
     private String memo;
     private LocalDate lessonDate;
 
-    public LessonNote(Long studentId, String lessonContent, String homework, String memo, LocalDate lessonDate) {
-        this.studentId = studentId;
+    public LessonNote(Student student, String lessonContent, String homework, String memo, LocalDate lessonDate) {
+        this.student = student;
         this.lessonDate = lessonDate;
         this.lessonContent = lessonContent;
         this.homework = homework;

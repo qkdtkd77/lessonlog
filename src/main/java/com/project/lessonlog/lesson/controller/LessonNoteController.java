@@ -5,6 +5,7 @@ import com.project.lessonlog.lesson.config.AppConstant;
 import com.project.lessonlog.lesson.dto.LessonNoteDto;
 import com.project.lessonlog.lesson.dto.LessonNoteRequest;
 import com.project.lessonlog.lesson.dto.LessonNoteResponse;
+import com.project.lessonlog.lesson.mapper.LessonNoteMapper;
 import com.project.lessonlog.lesson.service.LessonNoteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +21,11 @@ import java.util.List;
 public class LessonNoteController {
 
     private final LessonNoteService lessonNoteService;
+    private final LessonNoteMapper lessonNoteMapper;
 
     @PostMapping("/students/{studentId}/lessons")
     public ResponseEntity<LessonNoteResponse<LessonNoteDto>> createLessonNote(@PathVariable Long studentId, @Valid @RequestBody LessonNoteRequest request) {
-        LessonNoteDto savedLessonNote = lessonNoteService.createLessonNote(LessonNoteDto.create(
-                studentId, request.getLessonContent(), request.getHomework(), request.getMemo(), request.getLessonDate()));
+        LessonNoteDto savedLessonNote = lessonNoteService.createLessonNote(lessonNoteMapper.toCreateDto(studentId, request));
         return ResponseEntity.status(HttpStatus.CREATED).body(new LessonNoteResponse<>(savedLessonNote));
     }
 
@@ -37,16 +38,14 @@ public class LessonNoteController {
             @RequestParam(value = "sortOrder", defaultValue = AppConstant.SORT_LESSON_NOTE_DESC) String sortOrder
     ) {
 
-
         PageResponse<List<LessonNoteDto>> lessonNotes = lessonNoteService.getLessonNotes(studentId, pageNumber, pageSize, sortBy, sortOrder);
         return ResponseEntity.ok().body(lessonNotes);
     }
 
     @PutMapping("/lessons/{lessonId}")
     public ResponseEntity<LessonNoteResponse<LessonNoteDto>> updateLessonNote(@PathVariable Long lessonId, @Valid @RequestBody LessonNoteRequest request) {
-        LessonNoteDto lessonNoteDto = LessonNoteDto.update(
-                request.getLessonContent(), request.getHomework(), request.getMemo(), request.getLessonDate());
-        LessonNoteDto updatedLessonNote = lessonNoteService.updateLessonNote(lessonId, lessonNoteDto);
+        LessonNoteDto updateDto = lessonNoteMapper.toUpdateDto(request);
+        LessonNoteDto updatedLessonNote = lessonNoteService.updateLessonNote(lessonId, updateDto);
         return ResponseEntity.ok().body(new LessonNoteResponse<>(updatedLessonNote));
     }
 }

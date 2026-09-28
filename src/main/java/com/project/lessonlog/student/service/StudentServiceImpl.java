@@ -37,12 +37,7 @@ public class StudentServiceImpl implements StudentService {
         List<Student> students = studentPage.getContent();
 
 
-        return new PageResponse<>(studentMapper.toStudentDtoList(students),
-                studentPage.getNumber() + 1,
-                studentPage.getSize(),
-                studentPage.getTotalElements(),
-                studentPage.getTotalPages(),
-                studentPage.isLast());
+        return PageResponse.of(studentMapper.toStudentDtoList(students), studentPage);
     }
 
     @Override
