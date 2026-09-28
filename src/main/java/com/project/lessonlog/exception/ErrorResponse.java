@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public record ErrorResponse(List<String> errors) {
-    
+public record ErrorResponse(String errorMessage, List<String> errors) {
+    public ErrorResponse(String errorMessage) {
+        this(errorMessage, null);
+    }
 }
