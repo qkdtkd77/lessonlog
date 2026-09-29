@@ -1,4 +1,4 @@
-package com.project.lessonlog.common;
+package com.project.lessonlog.common.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

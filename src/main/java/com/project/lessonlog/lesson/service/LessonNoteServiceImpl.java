@@ -1,7 +1,6 @@
 package com.project.lessonlog.lesson.service;
 
-import com.project.lessonlog.common.PageResponse;
-import com.project.lessonlog.common.PaginationValidator;
+import com.project.lessonlog.common.dto.PageResponse;
 import com.project.lessonlog.exception.LessonNoteNotFoundException;
 import com.project.lessonlog.exception.StudentIdRequiredException;
 import com.project.lessonlog.exception.StudentNotFoundException;
@@ -11,15 +10,17 @@ import com.project.lessonlog.lesson.mapper.LessonNoteMapper;
 import com.project.lessonlog.lesson.repository.LessonNoteRepository;
 import com.project.lessonlog.student.domain.Student;
 import com.project.lessonlog.student.repository.StudentRepository;
+import com.project.lessonlog.util.PageableFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static com.project.lessonlog.lesson.config.AppConstant.DEFAULT_PAGE_SIZE;
+import static com.project.lessonlog.lesson.config.AppConstant.SORT_LESSON_NOTE_BY;
 
 @Service
 @RequiredArgsConstructor
@@ -44,18 +45,8 @@ public class LessonNoteServiceImpl implements LessonNoteService {
     }
 
     @Override
-    public PageResponse<List<LessonNoteDto>> getLessonNotes(Long studentId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
-        PaginationValidator.validate(pageNumber, pageSize, sortBy, sortOrder, List.of("lessonDate"));
-
-        studentRepository.findById(studentId).orElseThrow(
-                () -> new StudentNotFoundException(studentId));
-
-        Sort sort = Sort.by(sortOrder.equalsIgnoreCase("desc")
-                        ? Sort.Direction.DESC
-                        : Sort.Direction.ASC,
-                sortBy);
-
-        Pageable pageDetails = PageRequest.of(pageNumber - 1, pageSize, sort);
+    public PageResponse<List<LessonNoteDto>> getLessonNotes(Long studentId, Integer pageNumber, String sortOrder) {
+        Pageable pageDetails = PageableFactory.create(pageNumber, DEFAULT_PAGE_SIZE, SORT_LESSON_NOTE_BY, sortOrder);
         Page<LessonNote> lessonNotePage = lessonNoteRepository.findByStudent_Id(studentId, pageDetails);
         List<LessonNote> lessonNotes = lessonNotePage.getContent();
 
