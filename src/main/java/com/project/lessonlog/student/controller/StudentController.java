@@ -1,7 +1,6 @@
 package com.project.lessonlog.student.controller;
 
-import com.project.lessonlog.common.PageResponse;
-import com.project.lessonlog.student.config.AppConstant;
+import com.project.lessonlog.common.dto.PageResponse;
 import com.project.lessonlog.student.dto.StudentDto;
 import com.project.lessonlog.student.dto.StudentRequest;
 import com.project.lessonlog.student.dto.StudentResponse;
@@ -14,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.project.lessonlog.student.config.AppConstant.DEFAULT_PAGE_NUMBER;
+
 @RestController
 @RequestMapping("/api/students")
 @RequiredArgsConstructor
@@ -23,13 +24,9 @@ public class StudentController {
 
     @GetMapping
     public ResponseEntity<PageResponse<List<StudentDto>>> getStudent(
-            @RequestParam(value = "pageNumber", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER) Integer pageNumber,
-            @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
-            @RequestParam(value = "sortBy", defaultValue = AppConstant.SORT_STUDENT_BY) String sortBy,
-            @RequestParam(value = "sortOrder", defaultValue = AppConstant.SORT_STUDENT_ASC) String sortOrder
-    ) {
+            @RequestParam(value = "pageNumber", defaultValue = DEFAULT_PAGE_NUMBER) Integer pageNumber) {
 
-        PageResponse<List<StudentDto>> allStudents = studentService.getAllStudents(pageNumber, pageSize, sortBy, sortOrder);
+        PageResponse<List<StudentDto>> allStudents = studentService.getAllStudents(pageNumber);
         return ResponseEntity.ok().body(allStudents);
     }
 

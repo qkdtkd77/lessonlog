@@ -1,7 +1,6 @@
 package com.project.lessonlog.lesson.controller;
 
-import com.project.lessonlog.common.PageResponse;
-import com.project.lessonlog.lesson.config.AppConstant;
+import com.project.lessonlog.common.dto.PageResponse;
 import com.project.lessonlog.lesson.dto.LessonNoteDto;
 import com.project.lessonlog.lesson.dto.LessonNoteRequest;
 import com.project.lessonlog.lesson.dto.LessonNoteResponse;
@@ -14,6 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static com.project.lessonlog.lesson.config.AppConstant.DEFAULT_PAGE_NUMBER;
+import static com.project.lessonlog.lesson.config.AppConstant.SORT_LESSON_NOTE_DESC;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,13 +34,10 @@ public class LessonNoteController {
     @GetMapping("/students/{studentId}/lessons")
     public ResponseEntity<PageResponse<List<LessonNoteDto>>> getLessonNote(
             @PathVariable Long studentId,
-            @RequestParam(value = "pageNumber", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER) Integer pageNumber,
-            @RequestParam(value = "pageSize", defaultValue = AppConstant.DEFAULT_PAGE_SIZE) Integer pageSize,
-            @RequestParam(value = "sortBy", defaultValue = AppConstant.SORT_LESSON_NOTE_BY) String sortBy,
-            @RequestParam(value = "sortOrder", defaultValue = AppConstant.SORT_LESSON_NOTE_DESC) String sortOrder
-    ) {
+            @RequestParam(value = "pageNumber", defaultValue = DEFAULT_PAGE_NUMBER) Integer pageNumber,
+            @RequestParam(value = "sortOrder", defaultValue = SORT_LESSON_NOTE_DESC) String sortOrder) {
 
-        PageResponse<List<LessonNoteDto>> lessonNotes = lessonNoteService.getLessonNotes(studentId, pageNumber, pageSize, sortBy, sortOrder);
+        PageResponse<List<LessonNoteDto>> lessonNotes = lessonNoteService.getLessonNotes(studentId, pageNumber, sortOrder);
         return ResponseEntity.ok().body(lessonNotes);
     }
 
