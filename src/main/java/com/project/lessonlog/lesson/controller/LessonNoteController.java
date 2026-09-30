@@ -47,4 +47,10 @@ public class LessonNoteController {
         LessonNoteDto updatedLessonNote = lessonNoteService.updateLessonNote(lessonId, updateDto);
         return ResponseEntity.ok().body(new LessonNoteResponse<>(updatedLessonNote));
     }
+
+    @DeleteMapping("/lessons/{lessonId}")
+    public ResponseEntity<Void> deleteLessonNote(@PathVariable Long lessonId) {
+        lessonNoteService.deleteLessonNote(lessonId);
+        return ResponseEntity.noContent().build();
+    }
 }

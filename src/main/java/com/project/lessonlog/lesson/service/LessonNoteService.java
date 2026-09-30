@@ -11,4 +11,6 @@ public interface LessonNoteService {
     PageResponse<List<LessonNoteDto>> getLessonNotes(Long studentId, Integer pageNumber, String sortOrder);
 
     LessonNoteDto updateLessonNote(Long lessonId, LessonNoteDto lessonNoteDto);
+
+    void deleteLessonNote(Long lessonId);
 }
