@@ -62,4 +62,12 @@ public class LessonNoteServiceImpl implements LessonNoteService {
         exists.updateLessonNote(lessonNote.getLessonContent(), lessonNote.getHomework(), lessonNote.getMemo(), lessonNote.getLessonDate());
         return lessonNoteMapper.toDto(exists);
     }
+
+    @Override
+    @Transactional
+    public void deleteLessonNote(Long lessonId) {
+        LessonNote lessonNote = lessonNoteRepository.findById(lessonId).orElseThrow(
+                () -> new LessonNoteNotFoundException(lessonId));
+        lessonNoteRepository.delete(lessonNote);
+    }
 }
