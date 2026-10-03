@@ -20,6 +20,7 @@ import static com.project.lessonlog.student.config.AppConstant.*;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class StudentServiceImpl implements StudentService {
 
     private static final List<String> SORTABLE_FIELDS = List.of("id", "name");
@@ -37,6 +38,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
+    @Transactional
     public StudentDto registerStudent(String name, String instrument, String phone, String memo) {
         return studentMapper.toStudentDto(studentRepository.save(new Student(name, instrument, phone, memo)));
     }

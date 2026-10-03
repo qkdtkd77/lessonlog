@@ -3,7 +3,7 @@
 -- ========================================
 
 INSERT INTO student (id, name, instrument, phone, memo)
-VALUES (1, '김태민', 'Bass', '010-1111-1111', '주 1회 수업');
+VALUES (1, '김민수', 'Bass', '010-1111-1111', '주 1회 수업');
 
 INSERT INTO student (id, name, instrument, phone, memo)
 VALUES (2, '이서연', 'Piano', '010-2222-2222', '입시 준비');
