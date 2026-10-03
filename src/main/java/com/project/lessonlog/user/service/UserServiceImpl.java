@@ -24,6 +24,7 @@ public class UserServiceImpl implements UserService {
             throw new EmailDuplicatedException("Email already exists");
         }
 
+        // TODO: Spring Security 적용 후 PasswordEncoder로 비밀번호 암호화
         User userEntity = userMapper.toEntity(userRequest);
         userRepository.save(userEntity);
     }
