@@ -24,6 +24,7 @@ import static com.project.lessonlog.lesson.config.AppConstant.SORT_LESSON_NOTE_B
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class LessonNoteServiceImpl implements LessonNoteService {
 
     private final LessonNoteRepository lessonNoteRepository;
@@ -31,6 +32,7 @@ public class LessonNoteServiceImpl implements LessonNoteService {
     private final LessonNoteMapper lessonNoteMapper;
 
     @Override
+    @Transactional
     public LessonNoteDto createLessonNote(LessonNoteDto lessonNoteDto) {
         if (lessonNoteDto.getStudentId() == null) {
             throw new StudentIdRequiredException();
