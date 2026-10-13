@@ -29,7 +29,8 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public StudentResponse getAllStudents(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
-        Pageable pageDetails = PageableFactory.create(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS);
+        Pageable pageDetails = PageableFactory.createWithTieBreaker(
+                pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS, "id");
         Page<Student> studentPage = studentRepository.findAll(pageDetails);
         List<Student> students = studentPage.getContent();
 
