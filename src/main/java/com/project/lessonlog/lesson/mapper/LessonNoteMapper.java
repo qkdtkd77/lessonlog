@@ -19,7 +19,7 @@ public interface LessonNoteMapper {
 
     @Mapping(source = "studentId", target = "studentId")
     @Mapping(target = "id", ignore = true)
-    LessonNoteDto toCreateDto(Long studentId, LessonNoteRequest lessonNoteRequest);
+    LessonNoteDto toLessonNoteDto(Long studentId, LessonNoteRequest lessonNoteRequest);
 
     @Mapping(target = "studentId", ignore = true)
     @Mapping(target = "id", ignore = true)

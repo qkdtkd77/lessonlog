@@ -1,14 +1,12 @@
 package com.project.lessonlog.lesson.service;
 
-import com.project.lessonlog.common.dto.PageResponse;
 import com.project.lessonlog.lesson.dto.LessonNoteDto;
-
-import java.util.List;
+import com.project.lessonlog.lesson.dto.LessonNoteResponse;
 
 public interface LessonNoteService {
     LessonNoteDto createLessonNote(LessonNoteDto lessonNoteDto);
 
-    PageResponse<List<LessonNoteDto>> getLessonNotes(Long studentId, Integer pageNumber, String sortOrder);
+    LessonNoteResponse getAllLessonNotes(Long studentId, Integer pageNumber, Integer pageSize, String sortOrder);
 
     LessonNoteDto updateLessonNote(Long lessonId, LessonNoteDto lessonNoteDto);
 
