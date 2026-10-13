@@ -1,10 +1,11 @@
 package com.project.lessonlog.student.service;
 
-import com.project.lessonlog.common.dto.PageResponse;
 import com.project.lessonlog.exception.StudentNotFoundException;
 import com.project.lessonlog.lesson.repository.LessonNoteRepository;
 import com.project.lessonlog.student.domain.Student;
 import com.project.lessonlog.student.dto.StudentDto;
+import com.project.lessonlog.student.dto.StudentRequest;
+import com.project.lessonlog.student.dto.StudentResponse;
 import com.project.lessonlog.student.mapper.StudentMapper;
 import com.project.lessonlog.student.repository.StudentRepository;
 import com.project.lessonlog.util.PageableFactory;
@@ -15,8 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
-import static com.project.lessonlog.student.config.AppConstant.*;
 
 @Service
 @RequiredArgsConstructor
@@ -29,28 +28,17 @@ public class StudentServiceImpl implements StudentService {
     private final StudentMapper studentMapper;
 
     @Override
-    public PageResponse<List<StudentDto>> getAllStudents(Integer pageNumber) {
-        Pageable pageDetails = PageableFactory.create(pageNumber, DEFAULT_PAGE_SIZE, SORT_STUDENT_BY, SORT_STUDENT_ASC, SORTABLE_FIELDS);
+    public StudentResponse getAllStudents(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+        Pageable pageDetails = PageableFactory.create(pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS);
         Page<Student> studentPage = studentRepository.findAll(pageDetails);
         List<Student> students = studentPage.getContent();
 
-        return PageResponse.of(studentMapper.toStudentDtoList(students), studentPage);
-    }
-
-    @Override
-    @Transactional
-    public StudentDto registerStudent(String name, String instrument, String phone, String memo) {
-        return studentMapper.toStudentDto(studentRepository.save(new Student(name, instrument, phone, memo)));
-    }
-
-    @Override
-    @Transactional
-    public void deleteStudent(Long studentId) {
-        Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new StudentNotFoundException(studentId));
-
-        lessonNoteRepository.deleteByStudent_Id(studentId);
-        studentRepository.delete(student);
+        return new StudentResponse(studentMapper.toStudentDtoList(students),
+                studentPage.getNumber() + 1,
+                studentPage.getSize(),
+                studentPage.getTotalElements(),
+                studentPage.getTotalPages(),
+                studentPage.isLast());
     }
 
     @Override
@@ -62,11 +50,33 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     @Transactional
-    public StudentDto updateStudent(Long studentId, StudentDto studentDto) {
+    public StudentDto registerStudent(StudentRequest studentRequest) {
+        Student student = studentMapper.toEntity(studentRequest);
+        Student saved = studentRepository.save(student);
+        return studentMapper.toStudentDto(saved);
+    }
+
+    @Override
+    @Transactional
+    public StudentDto updateStudent(Long studentId, StudentRequest studentRequest) {
         Student exists = studentRepository.findById(studentId).orElseThrow(
                 () -> new StudentNotFoundException(studentId));
 
-        exists.updateStudent(studentDto.getName(), studentDto.getInstrument(), studentDto.getPhone(), studentDto.getMemo());
+        exists.updateStudent(studentRequest.getName(),
+                studentRequest.getInstrument(),
+                studentRequest.getPhone(),
+                studentRequest.getMemo());
+
         return studentMapper.toStudentDto(exists);
+    }
+
+    @Override
+    @Transactional
+    public void deleteStudent(Long studentId) {
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new StudentNotFoundException(studentId));
+
+        lessonNoteRepository.deleteByStudent_Id(studentId);
+        studentRepository.delete(student);
     }
 }
