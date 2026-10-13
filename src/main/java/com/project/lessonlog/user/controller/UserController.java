@@ -19,8 +19,8 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@Valid @RequestBody UserRequest userRequest) {
+    public ResponseEntity<Void> signup(@Valid @RequestBody UserRequest userRequest) {
         userService.createUser(userRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body("회원가입에 성공했습니다.");
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

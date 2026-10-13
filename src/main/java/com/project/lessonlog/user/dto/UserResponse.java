@@ -1,7 +1,9 @@
 package com.project.lessonlog.user.dto;
 
-public class UserResponse<T> {
-    private T data;
+import java.util.List;
+
+public class UserResponse {
+    private List<UserDto> users;
     private Integer pageNumber;
     private Integer pageSize;
     private Long totalElements;
