@@ -26,6 +26,7 @@ public class Student {
     private String instrument;
 
     @NotBlank(message = "전화번호를 입력해주세요.")
+    // TODO: 전화번호 검증 방식 변경
     @Size(min = 13, max = 13, message = "올바르지 않은 전화번호입니다.")
     private String phone;
     private String memo;

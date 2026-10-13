@@ -1,19 +1,18 @@
 package com.project.lessonlog.student.service;
 
-import com.project.lessonlog.common.dto.PageResponse;
 import com.project.lessonlog.student.dto.StudentDto;
-
-import java.util.List;
+import com.project.lessonlog.student.dto.StudentRequest;
+import com.project.lessonlog.student.dto.StudentResponse;
 
 public interface StudentService {
 
-    PageResponse<List<StudentDto>> getAllStudents(Integer pageNumber);
+    StudentResponse getAllStudents(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 
-    StudentDto registerStudent(String name, String instrument, String phone, String memo);
+    StudentDto registerStudent(StudentRequest studentRequest);
 
     void deleteStudent(Long studentId);
 
     StudentDto getStudentById(Long studentId);
 
-    StudentDto updateStudent(Long studentId, StudentDto studentDto);
+    StudentDto updateStudent(Long studentId, StudentRequest studentRequest);
 }

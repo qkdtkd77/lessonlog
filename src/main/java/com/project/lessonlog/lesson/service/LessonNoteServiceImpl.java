@@ -1,11 +1,11 @@
 package com.project.lessonlog.lesson.service;
 
-import com.project.lessonlog.common.dto.PageResponse;
 import com.project.lessonlog.exception.LessonNoteNotFoundException;
 import com.project.lessonlog.exception.StudentIdRequiredException;
 import com.project.lessonlog.exception.StudentNotFoundException;
 import com.project.lessonlog.lesson.domain.LessonNote;
 import com.project.lessonlog.lesson.dto.LessonNoteDto;
+import com.project.lessonlog.lesson.dto.LessonNoteResponse;
 import com.project.lessonlog.lesson.mapper.LessonNoteMapper;
 import com.project.lessonlog.lesson.repository.LessonNoteRepository;
 import com.project.lessonlog.student.domain.Student;
@@ -19,17 +19,32 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.project.lessonlog.lesson.config.AppConstant.DEFAULT_PAGE_SIZE;
-import static com.project.lessonlog.lesson.config.AppConstant.SORT_LESSON_NOTE_BY;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class LessonNoteServiceImpl implements LessonNoteService {
 
+    private static final String SORTABLE_FIELD = "lessonDate";
     private final LessonNoteRepository lessonNoteRepository;
     private final StudentRepository studentRepository;
     private final LessonNoteMapper lessonNoteMapper;
+
+    @Override
+    public LessonNoteResponse getAllLessonNotes(Long studentId, Integer pageNumber, Integer pageSize, String sortOrder) {
+        if (!studentRepository.existsById(studentId)) {
+            throw new StudentNotFoundException(studentId);
+        }
+        Pageable pageDetails = PageableFactory.create(pageNumber, pageSize, SORTABLE_FIELD, sortOrder);
+        Page<LessonNote> lessonNotePage = lessonNoteRepository.findByStudent_Id(studentId, pageDetails);
+        List<LessonNote> lessonNotes = lessonNotePage.getContent();
+
+        return new LessonNoteResponse(lessonNoteMapper.toDtoList(lessonNotes),
+                lessonNotePage.getNumber() + 1,
+                lessonNotePage.getSize(),
+                lessonNotePage.getTotalElements(),
+                lessonNotePage.getTotalPages(),
+                lessonNotePage.isLast());
+    }
 
     @Override
     @Transactional
@@ -44,15 +59,6 @@ public class LessonNoteServiceImpl implements LessonNoteService {
         LessonNote saved = lessonNoteRepository.save(lessonNote);
 
         return lessonNoteMapper.toDto(saved);
-    }
-
-    @Override
-    public PageResponse<List<LessonNoteDto>> getLessonNotes(Long studentId, Integer pageNumber, String sortOrder) {
-        Pageable pageDetails = PageableFactory.create(pageNumber, DEFAULT_PAGE_SIZE, SORT_LESSON_NOTE_BY, sortOrder);
-        Page<LessonNote> lessonNotePage = lessonNoteRepository.findByStudent_Id(studentId, pageDetails);
-        List<LessonNote> lessonNotes = lessonNotePage.getContent();
-
-        return PageResponse.of(lessonNoteMapper.toDtoList(lessonNotes), lessonNotePage);
     }
 
     @Override
