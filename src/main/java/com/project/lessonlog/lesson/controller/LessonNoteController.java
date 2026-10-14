@@ -3,7 +3,6 @@ package com.project.lessonlog.lesson.controller;
 import com.project.lessonlog.lesson.dto.LessonNoteDto;
 import com.project.lessonlog.lesson.dto.LessonNoteRequest;
 import com.project.lessonlog.lesson.dto.LessonNoteResponse;
-import com.project.lessonlog.lesson.mapper.LessonNoteMapper;
 import com.project.lessonlog.lesson.service.LessonNoteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,6 @@ import static com.project.lessonlog.lesson.config.AppConstant.*;
 public class LessonNoteController {
 
     private final LessonNoteService lessonNoteService;
-    private final LessonNoteMapper lessonNoteMapper;
 
     @GetMapping("/students/{studentId}/lessons")
     public ResponseEntity<LessonNoteResponse> getAllLessonNotes(
@@ -37,7 +35,7 @@ public class LessonNoteController {
     public ResponseEntity<LessonNoteDto> createLessonNote(
             @PathVariable Long studentId,
             @Valid @RequestBody LessonNoteRequest request) {
-        LessonNoteDto savedLessonNote = lessonNoteService.createLessonNote(lessonNoteMapper.toLessonNoteDto(studentId, request));
+        LessonNoteDto savedLessonNote = lessonNoteService.createLessonNote(studentId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedLessonNote);
     }
 
@@ -45,8 +43,7 @@ public class LessonNoteController {
     public ResponseEntity<LessonNoteDto> updateLessonNote(
             @PathVariable Long lessonId,
             @Valid @RequestBody LessonNoteRequest request) {
-        LessonNoteDto updateDto = lessonNoteMapper.toUpdateDto(request);
-        LessonNoteDto updatedLessonNote = lessonNoteService.updateLessonNote(lessonId, updateDto);
+        LessonNoteDto updatedLessonNote = lessonNoteService.updateLessonNote(lessonId, request);
         return ResponseEntity.ok().body(updatedLessonNote);
     }
 
