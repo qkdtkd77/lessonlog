@@ -11,6 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class StudentDto {
     private Long id;
+    private Long userId;
     private String name;
     private String instrument;
     private String phone;

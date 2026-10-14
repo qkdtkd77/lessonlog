@@ -1,18 +1,39 @@
 -- ========================================
--- Student
+-- User
 -- ========================================
 
-INSERT INTO student (id, name, instrument, phone, memo)
-VALUES (1, '김민수', 'Bass', '010-1111-1111', '주 1회 수업');
+INSERT INTO users (id, email, password, name, created_at)
+VALUES (1,
+        'teacher1@test.com',
+        '$2a$10$abcdefghijklmnopqrstuuabcdefghijklmnopqrstuvwx123456',
+        '김선생',
+        '2026-10-14 09:00:00');
 
-INSERT INTO student (id, name, instrument, phone, memo)
-VALUES (2, '이서연', 'Piano', '010-2222-2222', '입시 준비');
+INSERT INTO users (id, email, password, name, created_at)
+VALUES (2,
+        'teacher2@test.com',
+        '$2a$10$abcdefghijklmnopqrstuuabcdefghijklmnopqrstuvwx654321',
+        '이선생',
+        '2026-10-14 09:00:00');
 
-INSERT INTO student (id, name, instrument, phone, memo)
-VALUES (3, '박준호', 'Guitar', '010-3333-3333', '취미반');
 
-INSERT INTO student (id, name, instrument, phone, memo)
-VALUES (4, '최유진', 'Drum', '010-4444-4444', '밴드 활동 중');
+-- ========================================
+-- Student
+-- User 1 → Student 1, 2
+-- User 2 → Student 3, 4
+-- ========================================
+
+INSERT INTO student (id, user_id, name, instrument, phone, memo)
+VALUES (1, 1, '김민수', 'Bass', '010-1111-1111', '주 1회 수업');
+
+INSERT INTO student (id, user_id, name, instrument, phone, memo)
+VALUES (2, 1, '이서연', 'Piano', '010-2222-2222', '입시 준비');
+
+INSERT INTO student (id, user_id, name, instrument, phone, memo)
+VALUES (3, 2, '박준호', 'Guitar', '010-3333-3333', '취미반');
+
+INSERT INTO student (id, user_id, name, instrument, phone, memo)
+VALUES (4, 2, '최유진', 'Drum', '010-4444-4444', '밴드 활동 중');
 
 
 -- ========================================
@@ -155,8 +176,15 @@ INSERT INTO lesson_note (id, student_id, lesson_content, homework, memo, lesson_
 VALUES (40, 4, '전체 곡 연주', '원곡과 전체 연주', '', '2026-09-05');
 
 
+-- ========================================
 -- H2 IDENTITY 다음 생성값 조정
+-- ========================================
+
+ALTER TABLE users
+    ALTER COLUMN id RESTART WITH 3;
+
 ALTER TABLE student
     ALTER COLUMN id RESTART WITH 5;
+
 ALTER TABLE lesson_note
     ALTER COLUMN id RESTART WITH 41;
