@@ -12,4 +12,6 @@ public interface LessonNoteService {
     LessonNoteDto updateLessonNote(Long lessonId, LessonNoteRequest request);
 
     void deleteLessonNote(Long lessonId);
+
+    LessonNoteDto getLessonNoteById(Long lessonId);
 }

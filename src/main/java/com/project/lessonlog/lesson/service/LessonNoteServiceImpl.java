@@ -47,6 +47,14 @@ public class LessonNoteServiceImpl implements LessonNoteService {
     }
 
     @Override
+    public LessonNoteDto getLessonNoteById(Long lessonId) {
+        LessonNote lessonNote = lessonNoteRepository.findById(lessonId).orElseThrow(
+                () -> new LessonNoteNotFoundException(lessonId));
+
+        return lessonNoteMapper.toDto(lessonNote);
+    }
+
+    @Override
     @Transactional
     public LessonNoteDto createLessonNote(Long studentId, LessonNoteRequest request) {
         Student student = studentRepository.findById(studentId).orElseThrow(

@@ -28,8 +28,15 @@ public class LessonNoteController {
         LessonNoteResponse allLessonNotes = lessonNoteService.getAllLessonNotes(
                 studentId, pageNumber, pageSize, sortOrder);
 
-        return ResponseEntity.ok().body(allLessonNotes);
+        return ResponseEntity.ok(allLessonNotes);
     }
+
+    @GetMapping("/lessons/{lessonId}")
+    public ResponseEntity<LessonNoteDto> getLessonNoteById(@PathVariable Long lessonId) {
+        LessonNoteDto lessonNoteDto = lessonNoteService.getLessonNoteById(lessonId);
+        return ResponseEntity.ok(lessonNoteDto);
+    }
+
 
     @PostMapping("/students/{studentId}/lessons")
     public ResponseEntity<LessonNoteDto> createLessonNote(
@@ -44,7 +51,7 @@ public class LessonNoteController {
             @PathVariable Long lessonId,
             @Valid @RequestBody LessonNoteRequest request) {
         LessonNoteDto updatedLessonNote = lessonNoteService.updateLessonNote(lessonId, request);
-        return ResponseEntity.ok().body(updatedLessonNote);
+        return ResponseEntity.ok(updatedLessonNote);
     }
 
     @DeleteMapping("/lessons/{lessonId}")
