@@ -17,16 +17,7 @@ public interface LessonNoteMapper {
 
     List<LessonNoteDto> toDtoList(List<LessonNote> lessonNotes);
 
-    @Mapping(source = "studentId", target = "studentId")
     @Mapping(target = "id", ignore = true)
-    LessonNoteDto toLessonNoteDto(Long studentId, LessonNoteRequest lessonNoteRequest);
-
-    @Mapping(target = "studentId", ignore = true)
-    @Mapping(target = "id", ignore = true)
-    LessonNoteDto toUpdateDto(LessonNoteRequest lessonNoteRequest);
-
-    @Mapping(target = "id", ignore = true)
-    @Mapping(source = "student", target = "student")
-    @Mapping(source = "lessonNoteDto.memo", target = "memo")
-    LessonNote toEntity(Student student, LessonNoteDto lessonNoteDto);
+    @Mapping(source = "request.memo", target = "memo")
+    LessonNote createEntityFromRequest(Student student, LessonNoteRequest request);
 }

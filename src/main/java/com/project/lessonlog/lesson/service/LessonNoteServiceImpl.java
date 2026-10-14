@@ -1,10 +1,10 @@
 package com.project.lessonlog.lesson.service;
 
 import com.project.lessonlog.exception.LessonNoteNotFoundException;
-import com.project.lessonlog.exception.StudentIdRequiredException;
 import com.project.lessonlog.exception.StudentNotFoundException;
 import com.project.lessonlog.lesson.domain.LessonNote;
 import com.project.lessonlog.lesson.dto.LessonNoteDto;
+import com.project.lessonlog.lesson.dto.LessonNoteRequest;
 import com.project.lessonlog.lesson.dto.LessonNoteResponse;
 import com.project.lessonlog.lesson.mapper.LessonNoteMapper;
 import com.project.lessonlog.lesson.repository.LessonNoteRepository;
@@ -47,28 +47,39 @@ public class LessonNoteServiceImpl implements LessonNoteService {
     }
 
     @Override
-    @Transactional
-    public LessonNoteDto createLessonNote(LessonNoteDto lessonNoteDto) {
-        if (lessonNoteDto.getStudentId() == null) {
-            throw new StudentIdRequiredException();
-        }
-        Student student = studentRepository.findById(lessonNoteDto.getStudentId()).orElseThrow(
-                () -> new StudentNotFoundException(lessonNoteDto.getStudentId()));
+    public LessonNoteDto getLessonNoteById(Long lessonId) {
+        LessonNote lessonNote = lessonNoteRepository.findById(lessonId).orElseThrow(
+                () -> new LessonNoteNotFoundException(lessonId));
 
-        LessonNote lessonNote = lessonNoteMapper.toEntity(student, lessonNoteDto);
-        LessonNote saved = lessonNoteRepository.save(lessonNote);
-
-        return lessonNoteMapper.toDto(saved);
+        return lessonNoteMapper.toDto(lessonNote);
     }
 
     @Override
     @Transactional
-    public LessonNoteDto updateLessonNote(Long lessonId, LessonNoteDto lessonNote) {
-        LessonNote exists = lessonNoteRepository.findById(lessonId).orElseThrow(
-                () -> new LessonNoteNotFoundException(lessonId));
+    public LessonNoteDto createLessonNote(Long studentId, LessonNoteRequest request) {
+        Student student = studentRepository.findById(studentId).orElseThrow(
+                () -> new StudentNotFoundException(studentId));
 
-        exists.updateLessonNote(lessonNote.getLessonContent(), lessonNote.getHomework(), lessonNote.getMemo(), lessonNote.getLessonDate());
-        return lessonNoteMapper.toDto(exists);
+        LessonNote lessonNote = lessonNoteMapper.createEntityFromRequest(student, request);
+        lessonNoteRepository.save(lessonNote);
+
+        return lessonNoteMapper.toDto(lessonNote);
+    }
+
+    @Override
+    @Transactional
+    public LessonNoteDto updateLessonNote(Long lessonId, LessonNoteRequest request) {
+        LessonNote lessonNote = lessonNoteRepository.findById(lessonId)
+                .orElseThrow(() -> new LessonNoteNotFoundException(lessonId));
+
+        lessonNote.updateLessonNote(
+                request.getLessonContent(),
+                request.getHomework(),
+                request.getMemo(),
+                request.getLessonDate()
+        );
+
+        return lessonNoteMapper.toDto(lessonNote);
     }
 
     @Override

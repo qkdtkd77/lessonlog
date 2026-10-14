@@ -29,13 +29,13 @@ public class StudentController {
             @RequestParam(value = "sortOrder", defaultValue = AppConstant.SORT_STUDENT_ASC) String sortOrder) {
 
         StudentResponse allStudents = studentService.getAllStudents(pageNumber, pageSize, sortBy, sortOrder);
-        return ResponseEntity.ok().body(allStudents);
+        return ResponseEntity.ok(allStudents);
     }
 
     @GetMapping("/{studentId}")
     public ResponseEntity<StudentDto> getStudentById(@PathVariable Long studentId) {
         StudentDto studentById = studentService.getStudentById(studentId);
-        return ResponseEntity.ok().body(studentById);
+        return ResponseEntity.ok(studentById);
     }
 
     @PostMapping
@@ -47,7 +47,7 @@ public class StudentController {
     @PutMapping("/{studentId}")
     public ResponseEntity<StudentDto> updateStudent(@PathVariable Long studentId, @Valid @RequestBody StudentRequest studentRequest) {
         StudentDto updatedStudent = studentService.updateStudent(studentId, studentRequest);
-        return ResponseEntity.ok().body(updatedStudent);
+        return ResponseEntity.ok(updatedStudent);
     }
 
     @DeleteMapping("/{studentId}")

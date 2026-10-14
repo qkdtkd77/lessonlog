@@ -3,7 +3,6 @@ package com.project.lessonlog.lesson.controller;
 import com.project.lessonlog.lesson.dto.LessonNoteDto;
 import com.project.lessonlog.lesson.dto.LessonNoteRequest;
 import com.project.lessonlog.lesson.dto.LessonNoteResponse;
-import com.project.lessonlog.lesson.mapper.LessonNoteMapper;
 import com.project.lessonlog.lesson.service.LessonNoteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,6 @@ import static com.project.lessonlog.lesson.config.AppConstant.*;
 public class LessonNoteController {
 
     private final LessonNoteService lessonNoteService;
-    private final LessonNoteMapper lessonNoteMapper;
 
     @GetMapping("/students/{studentId}/lessons")
     public ResponseEntity<LessonNoteResponse> getAllLessonNotes(
@@ -30,14 +28,21 @@ public class LessonNoteController {
         LessonNoteResponse allLessonNotes = lessonNoteService.getAllLessonNotes(
                 studentId, pageNumber, pageSize, sortOrder);
 
-        return ResponseEntity.ok().body(allLessonNotes);
+        return ResponseEntity.ok(allLessonNotes);
     }
+
+    @GetMapping("/lessons/{lessonId}")
+    public ResponseEntity<LessonNoteDto> getLessonNoteById(@PathVariable Long lessonId) {
+        LessonNoteDto lessonNoteDto = lessonNoteService.getLessonNoteById(lessonId);
+        return ResponseEntity.ok(lessonNoteDto);
+    }
+
 
     @PostMapping("/students/{studentId}/lessons")
     public ResponseEntity<LessonNoteDto> createLessonNote(
             @PathVariable Long studentId,
             @Valid @RequestBody LessonNoteRequest request) {
-        LessonNoteDto savedLessonNote = lessonNoteService.createLessonNote(lessonNoteMapper.toLessonNoteDto(studentId, request));
+        LessonNoteDto savedLessonNote = lessonNoteService.createLessonNote(studentId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedLessonNote);
     }
 
@@ -45,9 +50,8 @@ public class LessonNoteController {
     public ResponseEntity<LessonNoteDto> updateLessonNote(
             @PathVariable Long lessonId,
             @Valid @RequestBody LessonNoteRequest request) {
-        LessonNoteDto updateDto = lessonNoteMapper.toUpdateDto(request);
-        LessonNoteDto updatedLessonNote = lessonNoteService.updateLessonNote(lessonId, updateDto);
-        return ResponseEntity.ok().body(updatedLessonNote);
+        LessonNoteDto updatedLessonNote = lessonNoteService.updateLessonNote(lessonId, request);
+        return ResponseEntity.ok(updatedLessonNote);
     }
 
     @DeleteMapping("/lessons/{lessonId}")
