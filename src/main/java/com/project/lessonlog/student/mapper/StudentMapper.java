@@ -15,7 +15,6 @@ public interface StudentMapper {
     @Mapping(source = "user.id", target = "userId")
     StudentDto toStudentDto(Student student);
 
-    @Mapping(target = "id", ignore = true)
     List<StudentDto> toStudentDtoList(List<Student> students);
 
     @Mapping(source = "request.name", target = "name")
