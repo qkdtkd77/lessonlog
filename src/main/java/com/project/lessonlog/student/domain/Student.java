@@ -1,9 +1,7 @@
 package com.project.lessonlog.student.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.project.lessonlog.user.domain.User;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
@@ -31,7 +29,12 @@ public class Student {
     private String phone;
     private String memo;
 
-    public Student(String name, String instrument, String phone, String memo) {
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    public Student(User user, String name, String instrument, String phone, String memo) {
+        this.user = user;
         this.name = name;
         this.instrument = instrument;
         this.phone = phone;

@@ -15,7 +15,7 @@ import static com.project.lessonlog.student.config.AppConstant.DEFAULT_PAGE_NUMB
 import static com.project.lessonlog.student.config.AppConstant.DEFAULT_PAGE_SIZE;
 
 @RestController
-@RequestMapping("/api/students")
+@RequestMapping("/api/users/{userId}/students")
 @RequiredArgsConstructor
 public class StudentController {
 
@@ -26,33 +26,34 @@ public class StudentController {
             @RequestParam(value = "pageNumber", defaultValue = DEFAULT_PAGE_NUMBER) Integer pageNumber,
             @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE) Integer pageSize,
             @RequestParam(value = "sortBy", defaultValue = AppConstant.SORT_STUDENT_BY) String sortBy,
-            @RequestParam(value = "sortOrder", defaultValue = AppConstant.SORT_STUDENT_ASC) String sortOrder) {
+            @RequestParam(value = "sortOrder", defaultValue = AppConstant.SORT_STUDENT_ASC) String sortOrder,
+            @PathVariable Long userId) {
 
-        StudentResponse allStudents = studentService.getAllStudents(pageNumber, pageSize, sortBy, sortOrder);
+        StudentResponse allStudents = studentService.getAllStudents(userId, pageNumber, pageSize, sortBy, sortOrder);
         return ResponseEntity.ok(allStudents);
     }
 
     @GetMapping("/{studentId}")
-    public ResponseEntity<StudentDto> getStudentById(@PathVariable Long studentId) {
-        StudentDto studentById = studentService.getStudentById(studentId);
+    public ResponseEntity<StudentDto> getStudentById(@PathVariable Long userId, @PathVariable Long studentId) {
+        StudentDto studentById = studentService.getStudentById(userId, studentId);
         return ResponseEntity.ok(studentById);
     }
 
     @PostMapping
-    public ResponseEntity<StudentDto> registerStudent(@Valid @RequestBody StudentRequest studentRequest) {
-        StudentDto savedStudent = studentService.registerStudent(studentRequest);
+    public ResponseEntity<StudentDto> registerStudent(@PathVariable Long userId, @Valid @RequestBody StudentRequest studentRequest) {
+        StudentDto savedStudent = studentService.registerStudent(userId, studentRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedStudent);
     }
 
     @PutMapping("/{studentId}")
-    public ResponseEntity<StudentDto> updateStudent(@PathVariable Long studentId, @Valid @RequestBody StudentRequest studentRequest) {
-        StudentDto updatedStudent = studentService.updateStudent(studentId, studentRequest);
+    public ResponseEntity<StudentDto> updateStudent(@PathVariable Long userId, @PathVariable Long studentId, @Valid @RequestBody StudentRequest studentRequest) {
+        StudentDto updatedStudent = studentService.updateStudent(userId, studentId, studentRequest);
         return ResponseEntity.ok(updatedStudent);
     }
 
     @DeleteMapping("/{studentId}")
-    public ResponseEntity<Void> deleteStudent(@PathVariable Long studentId) {
-        studentService.deleteStudent(studentId);
+    public ResponseEntity<Void> deleteStudent(@PathVariable Long userId, @PathVariable Long studentId) {
+        studentService.deleteStudent(userId, studentId);
         return ResponseEntity.noContent().build();
     }
 }
