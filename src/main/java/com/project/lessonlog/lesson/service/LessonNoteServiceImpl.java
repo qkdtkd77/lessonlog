@@ -35,7 +35,7 @@ public class LessonNoteServiceImpl implements LessonNoteService {
             throw new StudentNotFoundException(studentId);
         }
         Pageable pageDetails = PageableFactory.create(pageNumber, pageSize, SORTABLE_FIELD, sortOrder);
-        Page<LessonNote> lessonNotePage = lessonNoteRepository.findByStudent_Id(studentId, pageDetails);
+        Page<LessonNote> lessonNotePage = lessonNoteRepository.findByStudentId(studentId, pageDetails);
         List<LessonNote> lessonNotes = lessonNotePage.getContent();
 
         return new LessonNoteResponse(lessonNoteMapper.toDtoList(lessonNotes),
