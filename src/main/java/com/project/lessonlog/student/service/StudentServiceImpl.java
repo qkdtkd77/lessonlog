@@ -33,8 +33,6 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public StudentResponse getAllStudents(Long userId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
-        validateUserExists(userId);
-
         Pageable pageDetails = PageableFactory.createWithTieBreaker(
                 pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS, "id");
         Page<Student> studentPage = studentRepository.findByUser_Id(userId, pageDetails);
@@ -50,9 +48,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public StudentDto getStudentById(Long userId, Long studentId) {
-        validateUserExists(userId);
-
-        Student student = studentRepository.findByIdAndUser_Id(studentId, userId)
+        Student student = studentRepository.findByIdAndUserId(studentId, userId)
                 .orElseThrow(() -> new StudentNotFoundException(studentId));
 
         return studentMapper.toStudentDto(student);
@@ -72,9 +68,7 @@ public class StudentServiceImpl implements StudentService {
     @Override
     @Transactional
     public StudentDto updateStudent(Long userId, Long studentId, StudentRequest studentRequest) {
-        validateUserExists(userId);
-
-        Student student = studentRepository.findByIdAndUser_Id(studentId, userId)
+        Student student = studentRepository.findByIdAndUserId(studentId, userId)
                 .orElseThrow(() -> new StudentNotFoundException(studentId));
 
         student.updateStudent(studentRequest.getName(),
@@ -88,18 +82,10 @@ public class StudentServiceImpl implements StudentService {
     @Override
     @Transactional
     public void deleteStudent(Long userId, Long studentId) {
-        validateUserExists(userId);
-
-        Student student = studentRepository.findByIdAndUser_Id(studentId, userId)
+        Student student = studentRepository.findByIdAndUserId(studentId, userId)
                 .orElseThrow(() -> new StudentNotFoundException(studentId));
 
-        lessonNoteRepository.deleteByStudent_Id(studentId);
+        lessonNoteRepository.deleteByStudentId(studentId);
         studentRepository.delete(student);
-    }
-
-    private void validateUserExists(Long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new UserNotFoundException(userId);
-        }
     }
 }

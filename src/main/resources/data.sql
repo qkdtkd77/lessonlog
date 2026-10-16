@@ -5,14 +5,14 @@
 INSERT INTO users (id, email, password, name, created_at)
 VALUES (1,
         'teacher1@test.com',
-        '$2a$10$abcdefghijklmnopqrstuuabcdefghijklmnopqrstuvwx123456',
+        '$2y$10$01PQ9Mb4X5XHDdhRFK4SEee.EETdJMeKuq70ffGOGIs6uWNF3eR/G',
         '김선생',
         '2026-10-14 09:00:00');
 
 INSERT INTO users (id, email, password, name, created_at)
 VALUES (2,
         'teacher2@test.com',
-        '$2a$10$abcdefghijklmnopqrstuuabcdefghijklmnopqrstuvwx654321',
+        '$2y$10$uwshMoYXCxCFpFLVlEl22O08VnEM1kKhBXSibkfloTLXrL.oKw0PG',
         '이선생',
         '2026-10-14 09:00:00');
 

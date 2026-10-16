@@ -1,5 +1,6 @@
 package com.project.lessonlog.student.controller;
 
+import com.project.lessonlog.security.CustomUserDetails;
 import com.project.lessonlog.student.config.AppConstant;
 import com.project.lessonlog.student.dto.StudentDto;
 import com.project.lessonlog.student.dto.StudentRequest;
@@ -9,13 +10,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import static com.project.lessonlog.student.config.AppConstant.DEFAULT_PAGE_NUMBER;
 import static com.project.lessonlog.student.config.AppConstant.DEFAULT_PAGE_SIZE;
 
 @RestController
-@RequestMapping("/api/users/{userId}/students")
+@RequestMapping("/api/students")
 @RequiredArgsConstructor
 public class StudentController {
 
@@ -23,37 +25,47 @@ public class StudentController {
 
     @GetMapping
     public ResponseEntity<StudentResponse> getAllStudents(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(value = "pageNumber", defaultValue = DEFAULT_PAGE_NUMBER) Integer pageNumber,
             @RequestParam(value = "pageSize", defaultValue = DEFAULT_PAGE_SIZE) Integer pageSize,
             @RequestParam(value = "sortBy", defaultValue = AppConstant.SORT_STUDENT_BY) String sortBy,
-            @RequestParam(value = "sortOrder", defaultValue = AppConstant.SORT_STUDENT_ASC) String sortOrder,
-            @PathVariable Long userId) {
+            @RequestParam(value = "sortOrder", defaultValue = AppConstant.SORT_STUDENT_ASC) String sortOrder
+    ) {
 
-        StudentResponse allStudents = studentService.getAllStudents(userId, pageNumber, pageSize, sortBy, sortOrder);
+        StudentResponse allStudents = studentService.getAllStudents(userDetails.getUserId(), pageNumber, pageSize, sortBy, sortOrder);
         return ResponseEntity.ok(allStudents);
     }
 
     @GetMapping("/{studentId}")
-    public ResponseEntity<StudentDto> getStudentById(@PathVariable Long userId, @PathVariable Long studentId) {
-        StudentDto studentById = studentService.getStudentById(userId, studentId);
+    public ResponseEntity<StudentDto> getStudentById(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long studentId) {
+        StudentDto studentById = studentService.getStudentById(userDetails.getUserId(), studentId);
         return ResponseEntity.ok(studentById);
     }
 
     @PostMapping
-    public ResponseEntity<StudentDto> registerStudent(@PathVariable Long userId, @Valid @RequestBody StudentRequest studentRequest) {
-        StudentDto savedStudent = studentService.registerStudent(userId, studentRequest);
+    public ResponseEntity<StudentDto> registerStudent(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestBody StudentRequest studentRequest) {
+        StudentDto savedStudent = studentService.registerStudent(userDetails.getUserId(), studentRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedStudent);
     }
 
     @PutMapping("/{studentId}")
-    public ResponseEntity<StudentDto> updateStudent(@PathVariable Long userId, @PathVariable Long studentId, @Valid @RequestBody StudentRequest studentRequest) {
-        StudentDto updatedStudent = studentService.updateStudent(userId, studentId, studentRequest);
+    public ResponseEntity<StudentDto> updateStudent(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long studentId,
+            @Valid @RequestBody StudentRequest studentRequest) {
+        StudentDto updatedStudent = studentService.updateStudent(userDetails.getUserId(), studentId, studentRequest);
         return ResponseEntity.ok(updatedStudent);
     }
 
     @DeleteMapping("/{studentId}")
-    public ResponseEntity<Void> deleteStudent(@PathVariable Long userId, @PathVariable Long studentId) {
-        studentService.deleteStudent(userId, studentId);
+    public ResponseEntity<Void> deleteStudent(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long studentId) {
+        studentService.deleteStudent(userDetails.getUserId(), studentId);
         return ResponseEntity.noContent().build();
     }
 }
