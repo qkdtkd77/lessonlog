@@ -17,5 +17,6 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(source = "encodedPassword", target = "password")
-    User toEntity(UserRequest userRequest, String encodedPassword);
+    @Mapping(source = "normalizedEmail", target = "email")
+    User toEntity(UserRequest userRequest, String normalizedEmail, String encodedPassword);
 }
