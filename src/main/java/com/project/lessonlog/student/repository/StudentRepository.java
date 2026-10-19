@@ -14,4 +14,6 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     Page<Student> findByUser_Id(Long userId, Pageable pageable);
 
     Optional<Student> findByIdAndUserId(Long studentId, Long userId);
+
+    boolean existsByIdAndUserId(Long studentId, Long userId);
 }
