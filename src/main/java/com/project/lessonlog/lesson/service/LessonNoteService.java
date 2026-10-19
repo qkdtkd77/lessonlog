@@ -5,13 +5,13 @@ import com.project.lessonlog.lesson.dto.LessonNoteRequest;
 import com.project.lessonlog.lesson.dto.LessonNoteResponse;
 
 public interface LessonNoteService {
-    LessonNoteDto createLessonNote(Long studentId, LessonNoteRequest request);
+    LessonNoteResponse getAllLessonNotes(Long userId, Long studentId, Integer pageNumber, Integer pageSize, String sortOrder);
 
-    LessonNoteResponse getAllLessonNotes(Long studentId, Integer pageNumber, Integer pageSize, String sortOrder);
+    LessonNoteDto getLessonNoteById(Long userId, Long lessonId);
 
-    LessonNoteDto updateLessonNote(Long lessonId, LessonNoteRequest request);
+    LessonNoteDto createLessonNote(Long userId, Long studentId, LessonNoteRequest request);
 
-    void deleteLessonNote(Long lessonId);
+    LessonNoteDto updateLessonNote(Long userId, Long lessonId, LessonNoteRequest request);
 
-    LessonNoteDto getLessonNoteById(Long lessonId);
+    void deleteLessonNote(Long userId, Long lessonId);
 }

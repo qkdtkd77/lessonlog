@@ -22,12 +22,15 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void createUser(UserRequest userRequest) {
-        if (userRepository.existsByEmail(userRequest.getEmail())) {
+        String normalizedEmail = userRequest.getEmail()
+                .trim()
+                .toLowerCase();
+        if (userRepository.existsByEmail(normalizedEmail)) {
             throw new EmailDuplicatedException("Email already exists");
         }
 
         String encodedPassword = passwordEncoder.encode(userRequest.getPassword());
-        User userEntity = userMapper.toEntity(userRequest, encodedPassword);
+        User userEntity = userMapper.toEntity(userRequest, normalizedEmail, encodedPassword);
         userRepository.save(userEntity);
     }
 }
