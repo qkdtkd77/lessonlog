@@ -1,6 +1,6 @@
 package com.project.lessonlog.util;
 
-import com.project.lessonlog.exception.InvalidPaginationException;
+import com.project.lessonlog.exception.custom.InvalidPaginationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

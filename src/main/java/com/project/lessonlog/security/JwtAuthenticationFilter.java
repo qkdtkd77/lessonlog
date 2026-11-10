@@ -1,8 +1,8 @@
 package com.project.lessonlog.security;
 
-import com.project.lessonlog.exception.UserNotFoundException;
-import com.project.lessonlog.user.domain.User;
-import com.project.lessonlog.user.repository.UserRepository;
+import com.project.lessonlog.exception.custom.UserNotFoundException;
+import com.project.lessonlog.user.User;
+import com.project.lessonlog.user.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;

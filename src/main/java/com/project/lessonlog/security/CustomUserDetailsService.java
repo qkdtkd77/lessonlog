@@ -1,7 +1,7 @@
 package com.project.lessonlog.security;
 
-import com.project.lessonlog.user.domain.User;
-import com.project.lessonlog.user.repository.UserRepository;
+import com.project.lessonlog.user.User;
+import com.project.lessonlog.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.userdetails.UserDetails;

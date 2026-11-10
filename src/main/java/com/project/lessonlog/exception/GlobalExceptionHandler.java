@@ -1,5 +1,6 @@
 package com.project.lessonlog.exception;
 
+import com.project.lessonlog.exception.custom.*;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
