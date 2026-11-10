@@ -4,6 +4,7 @@ import com.project.lessonlog.exception.UserNotFoundException;
 import com.project.lessonlog.user.domain.User;
 import com.project.lessonlog.user.repository.UserRepository;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,6 +14,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -28,7 +30,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String header = request.getHeader("Authorization");
         String token = null;
         if (header != null && header.startsWith("Bearer ")) {
-            token = header.substring("Bearer ".length());
+            String value = header.substring("Bearer ".length());
+            if (StringUtils.hasText(value)) {
+                token = value;
+            }
         }
         return token;
     }
@@ -49,14 +54,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = resolveToken(request);
 
         if (token != null) {
-            Claims claims = jwtProvider.parseToken(token);
+            try {
+                Claims claims = jwtProvider.parseToken(token);
 
-            Long userId = Long.valueOf(claims.getSubject());
-            User user = userRepository.findById(userId).orElseThrow(
-                    () -> new UserNotFoundException(userId));
+                Long userId = Long.valueOf(claims.getSubject());
+                User user = userRepository.findById(userId).orElseThrow(
+                        () -> new UserNotFoundException(userId));
 
-            UsernamePasswordAuthenticationToken authentication = getUsernamePasswordAuthenticationToken(user);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                UsernamePasswordAuthenticationToken authentication = getUsernamePasswordAuthenticationToken(user);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (JwtException | UserNotFoundException e) {
+                SecurityContextHolder.clearContext();
+            }
         }
 
         filterChain.doFilter(request, response);
