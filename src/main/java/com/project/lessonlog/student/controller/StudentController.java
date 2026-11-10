@@ -1,7 +1,7 @@
 package com.project.lessonlog.student.controller;
 
 import com.project.lessonlog.security.CustomUserDetails;
-import com.project.lessonlog.student.config.AppConstant;
+import com.project.lessonlog.config.AppConstant;
 import com.project.lessonlog.student.dto.StudentDto;
 import com.project.lessonlog.student.dto.StudentRequest;
 import com.project.lessonlog.student.dto.StudentResponse;
@@ -13,8 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import static com.project.lessonlog.student.config.AppConstant.DEFAULT_PAGE_NUMBER;
-import static com.project.lessonlog.student.config.AppConstant.DEFAULT_PAGE_SIZE;
+import static com.project.lessonlog.config.AppConstant.DEFAULT_PAGE_NUMBER;
+import static com.project.lessonlog.config.AppConstant.DEFAULT_PAGE_SIZE;
 
 @RestController
 @RequestMapping("/api/students")

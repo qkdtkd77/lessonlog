@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import static com.project.lessonlog.lesson.config.AppConstant.*;
+import static com.project.lessonlog.config.AppConstant.*;
 
 @RestController
 @RequiredArgsConstructor
