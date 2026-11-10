@@ -7,6 +7,7 @@ import com.project.lessonlog.security.JwtProvider;
 import com.project.lessonlog.user.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -32,9 +33,8 @@ public class SecurityConfig {
             CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/signup").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/signup", "/api/auth/login").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
