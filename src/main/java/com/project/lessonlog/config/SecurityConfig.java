@@ -4,7 +4,7 @@ import com.project.lessonlog.security.CustomAuthenticationEntryPoint;
 import com.project.lessonlog.security.CustomUserDetailsService;
 import com.project.lessonlog.security.JwtAuthenticationFilter;
 import com.project.lessonlog.security.JwtProvider;
-import com.project.lessonlog.user.repository.UserRepository;
+import com.project.lessonlog.user.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

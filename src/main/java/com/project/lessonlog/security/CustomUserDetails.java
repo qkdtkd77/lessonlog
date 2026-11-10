@@ -1,6 +1,6 @@
 package com.project.lessonlog.security;
 
-import com.project.lessonlog.user.domain.User;
+import com.project.lessonlog.user.User;
 import lombok.Getter;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
