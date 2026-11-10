@@ -6,6 +6,7 @@
 #     예) JWT_SECRET='서버와 같은 값' ./scripts/auth-check.sh
 
 BASE_URL="${BASE_URL:-http://localhost:8080}"
+FAILED=0
 EMAIL="teacher1@test.com"
 PASSWORD="1234"
 
@@ -17,7 +18,13 @@ run() {
   status="${out##*$'\n'}"
   body="${out%$'\n'*}"
   [ ${#body} -gt 300 ] && body="${body:0:300}... (생략)"
-  printf '\n[%s]\n  목표: %s\n  결과: %s\n  본문: %s\n' "$name" "$expected" "$status" "${body:-(없음)}"
+  local want="${expected%%[!0-9]*}"   # 목표 문자열 앞의 숫자(상태 코드)만 비교
+  local mark="✅ 통과"
+  if [ "$status" != "$want" ]; then
+    mark="❌ 실패"
+    FAILED=$((FAILED + 1))
+  fi
+  printf '\n[%s] %s\n  목표: %s\n  결과: %s\n  본문: %s\n' "$name" "$mark" "$expected" "$status" "${body:-(없음)}"
 }
 
 b64url() { openssl base64 -A | tr '+/' '-_' | tr -d '='; }
@@ -77,3 +84,8 @@ run "7. 다른 사용자 학생 조회 (회귀)" "404" \
   "$BASE_URL/api/students/3" -H "Authorization: Bearer $TOKEN"
 
 echo
+if [ "$FAILED" -gt 0 ]; then
+  echo "❌ ${FAILED}개 케이스 실패"
+  exit 1
+fi
+echo "✅ 전부 통과"
