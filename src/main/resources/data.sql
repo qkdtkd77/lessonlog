@@ -2,18 +2,31 @@
 -- User
 -- ========================================
 
-INSERT INTO users (id, email, password, name, created_at)
+-- User 1, 2: TEACHER / User 3: ADMIN
+-- admin 비밀번호는 teacher1과 동일 (1234)
+
+INSERT INTO users (id, email, password, name, role, created_at)
 VALUES (1,
         'teacher1@test.com',
         '$2y$10$01PQ9Mb4X5XHDdhRFK4SEee.EETdJMeKuq70ffGOGIs6uWNF3eR/G',
         '김선생',
+        'TEACHER',
         '2026-10-14 09:00:00');
 
-INSERT INTO users (id, email, password, name, created_at)
+INSERT INTO users (id, email, password, name, role, created_at)
 VALUES (2,
         'teacher2@test.com',
         '$2y$10$uwshMoYXCxCFpFLVlEl22O08VnEM1kKhBXSibkfloTLXrL.oKw0PG',
         '이선생',
+        'TEACHER',
+        '2026-10-14 09:00:00');
+
+INSERT INTO users (id, email, password, name, role, created_at)
+VALUES (3,
+        'admin@test.com',
+        '$2y$10$01PQ9Mb4X5XHDdhRFK4SEee.EETdJMeKuq70ffGOGIs6uWNF3eR/G',
+        '관리자',
+        'ADMIN',
         '2026-10-14 09:00:00');
 
 
@@ -181,7 +194,7 @@ VALUES (40, 4, '전체 곡 연주', '원곡과 전체 연주', '', '2026-09-05')
 -- ========================================
 
 ALTER TABLE users
-    ALTER COLUMN id RESTART WITH 3;
+    ALTER COLUMN id RESTART WITH 4;
 
 ALTER TABLE student
     ALTER COLUMN id RESTART WITH 5;
