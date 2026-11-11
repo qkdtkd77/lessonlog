@@ -66,10 +66,10 @@ public class LessonNoteService {
         LessonNote lessonNote = findLessonNoteByUserId(userId, lessonId);
 
         lessonNote.updateLessonNote(
-                request.getLessonContent(),
-                request.getHomework(),
-                request.getMemo(),
-                request.getLessonDate()
+                request.lessonContent(),
+                request.homework(),
+                request.memo(),
+                request.lessonDate()
         );
 
         return lessonNoteMapper.toDto(lessonNote);

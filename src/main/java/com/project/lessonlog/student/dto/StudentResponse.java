@@ -1,19 +1,10 @@
 package com.project.lessonlog.student.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.List;
 
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-public class StudentResponse {
-    private List<StudentDto> students;
-    private Integer pageNumber;
-    private Integer pageSize;
-    private Long totalElements;
-    private Integer totalPages;
-    private Boolean lastPage;
+@JsonPropertyOrder({"students", "pageNumber", "pageSize", "totalElements", "totalPages", "lastPage"})
+public record StudentResponse(List<StudentDto> students, Integer pageNumber, Integer pageSize,
+                              Long totalElements, Integer totalPages, Boolean lastPage) {
 }

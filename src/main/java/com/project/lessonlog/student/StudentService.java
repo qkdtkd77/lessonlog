@@ -66,10 +66,10 @@ public class StudentService {
         Student student = studentRepository.findByIdAndUserId(studentId, userId)
                 .orElseThrow(() -> new BusinessException(STUDENT_NOT_FOUND));
 
-        student.updateStudent(studentRequest.getName(),
-                studentRequest.getInstrument(),
-                studentRequest.getPhone(),
-                studentRequest.getMemo());
+        student.updateStudent(studentRequest.name(),
+                studentRequest.instrument(),
+                studentRequest.phone(),
+                studentRequest.memo());
 
         return studentMapper.toStudentDto(student);
     }

@@ -26,14 +26,14 @@ public class UserService {
 
     @Transactional
     public void createUser(UserRequest userRequest) {
-        String normalizedEmail = userRequest.getEmail()
+        String normalizedEmail = userRequest.email()
                 .trim()
                 .toLowerCase();
         if (userRepository.existsByEmail(normalizedEmail)) {
             throw new BusinessException(EMAIL_DUPLICATED);
         }
 
-        String encodedPassword = passwordEncoder.encode(userRequest.getPassword());
+        String encodedPassword = passwordEncoder.encode(userRequest.password());
         User userEntity = userMapper.toEntity(userRequest, normalizedEmail, encodedPassword);
         userRepository.save(userEntity);
     }
