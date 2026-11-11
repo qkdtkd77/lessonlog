@@ -40,7 +40,7 @@ public class UserService {
 
     public UserResponse getUsers(Integer pageNumber, Integer pageSize) {
         Pageable pageable = PageableFactory.create(pageNumber, pageSize, "id", "asc");
-        Page<User> userPage = userRepository.findAll(pageable);
+        Page<User> userPage = userRepository.findByRole(UserRole.TEACHER, pageable);
         List<User> users = userPage.getContent();
 
         return new UserResponse(userMapper.toUserDtoList(users),
@@ -57,7 +57,7 @@ public class UserService {
             throw new SelfDeletionNotAllowedException();
         }
 
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId).orElseThrow(
+        User user = userRepository.findByIdAndRoleAndDeletedAtIsNull(userId, UserRole.TEACHER).orElseThrow(
                 () -> new UserNotFoundException(userId));
 
         user.delete();
