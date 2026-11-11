@@ -35,7 +35,11 @@ LOGIN=$(curl -s -X POST "$BASE_URL/api/auth/login" \
   -d "{\"email\":\"$EMAIL\",\"password\":\"$PASSWORD\"}")
 TOKEN=$(printf '%s' "$LOGIN" | sed -n 's/.*"accessToken":"\([^"]*\)".*/\1/p')
 if [ -z "$TOKEN" ]; then
-  echo "로그인 실패 - 서버 실행 여부와 계정을 확인해: $LOGIN"
+  if [ -z "$LOGIN" ]; then
+    echo "서버에 연결할 수 없어 - $BASE_URL 에 서버가 떠 있는지 확인해"
+  else
+    echo "로그인 실패 - 계정 또는 응답을 확인해: $LOGIN"
+  fi
   exit 1
 fi
 echo "토큰 발급 완료"
