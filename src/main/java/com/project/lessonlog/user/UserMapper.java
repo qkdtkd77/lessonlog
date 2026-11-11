@@ -15,7 +15,9 @@ public interface UserMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "deletedAt", ignore = true)
     @Mapping(source = "encodedPassword", target = "password")
     @Mapping(source = "normalizedEmail", target = "email")
+    @Mapping(target = "role", constant = "TEACHER")
     User toEntity(UserRequest userRequest, String normalizedEmail, String encodedPassword);
 }
