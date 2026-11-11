@@ -1,6 +1,8 @@
 package com.project.lessonlog.user;
 
 import com.project.lessonlog.exception.custom.EmailDuplicatedException;
+import com.project.lessonlog.exception.custom.SelfDeletionNotAllowedException;
+import com.project.lessonlog.exception.custom.UserNotFoundException;
 import com.project.lessonlog.user.dto.UserRequest;
 import com.project.lessonlog.user.dto.UserResponse;
 import com.project.lessonlog.util.PageableFactory;
@@ -47,5 +49,17 @@ public class UserService {
                 userPage.getTotalElements(),
                 userPage.getTotalPages(),
                 userPage.isLast());
+    }
+
+    @Transactional
+    public void deleteUser(Long adminId, Long userId) {
+        if (adminId.equals(userId)) {
+            throw new SelfDeletionNotAllowedException();
+        }
+
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId).orElseThrow(
+                () -> new UserNotFoundException(userId));
+
+        user.delete();
     }
 }
