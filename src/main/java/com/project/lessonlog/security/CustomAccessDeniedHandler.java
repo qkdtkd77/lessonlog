@@ -1,5 +1,6 @@
 package com.project.lessonlog.security;
 
+import com.project.lessonlog.exception.ErrorCode;
 import com.project.lessonlog.exception.ErrorResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +15,8 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
+import static com.project.lessonlog.exception.ErrorCode.ACCESS_DENIED;
+
 @Component
 @RequiredArgsConstructor
 @NullMarked
@@ -23,9 +26,10 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        ErrorCode errorCode = ACCESS_DENIED;
+        response.setStatus(errorCode.getStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
-        objectMapper.writeValue(response.getWriter(), new ErrorResponse("접근 권한이 없습니다."));
+        objectMapper.writeValue(response.getWriter(), new ErrorResponse(errorCode.getMessage()));
     }
 }

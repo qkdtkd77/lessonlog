@@ -1,7 +1,6 @@
 package com.project.lessonlog.lesson;
 
-import com.project.lessonlog.exception.custom.LessonNoteNotFoundException;
-import com.project.lessonlog.exception.custom.StudentNotFoundException;
+import com.project.lessonlog.exception.BusinessException;
 import com.project.lessonlog.lesson.dto.LessonNoteDto;
 import com.project.lessonlog.lesson.dto.LessonNoteRequest;
 import com.project.lessonlog.lesson.dto.LessonNoteResponse;
@@ -17,6 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.project.lessonlog.exception.ErrorCode.LESSON_NOTE_NOT_FOUND;
+import static com.project.lessonlog.exception.ErrorCode.STUDENT_NOT_FOUND;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -29,7 +31,7 @@ public class LessonNoteService {
 
     public LessonNoteResponse getAllLessonNotes(Long userId, Long studentId, Integer pageNumber, Integer pageSize, String sortOrder) {
         if (!studentRepository.existsByIdAndUserId(studentId, userId)) {
-            throw new StudentNotFoundException(studentId);
+            throw new BusinessException(STUDENT_NOT_FOUND);
         }
         Pageable pageDetails = PageableFactory.create(pageNumber, pageSize, SORTABLE_FIELD, sortOrder);
         Page<LessonNote> lessonNotePage = lessonNoteRepository.findByStudentUserIdAndStudentId(userId, studentId, pageDetails);
@@ -81,11 +83,11 @@ public class LessonNoteService {
 
     private @NonNull LessonNote findLessonNoteByUserId(Long userId, Long lessonId) {
         return lessonNoteRepository.findByIdAndStudentUserId(lessonId, userId).orElseThrow(
-                () -> new LessonNoteNotFoundException(lessonId));
+                () -> new BusinessException(LESSON_NOTE_NOT_FOUND));
     }
 
     private @NonNull Student findStudentByUserId(Long userId, Long studentId) {
         return studentRepository.findByIdAndUserId(studentId, userId).orElseThrow(
-                () -> new StudentNotFoundException(studentId));
+                () -> new BusinessException(STUDENT_NOT_FOUND));
     }
 }

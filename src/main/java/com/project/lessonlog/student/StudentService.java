@@ -1,7 +1,6 @@
 package com.project.lessonlog.student;
 
-import com.project.lessonlog.exception.custom.StudentNotFoundException;
-import com.project.lessonlog.exception.custom.UserNotFoundException;
+import com.project.lessonlog.exception.BusinessException;
 import com.project.lessonlog.lesson.LessonNoteRepository;
 import com.project.lessonlog.student.dto.StudentDto;
 import com.project.lessonlog.student.dto.StudentRequest;
@@ -16,6 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static com.project.lessonlog.exception.ErrorCode.STUDENT_NOT_FOUND;
+import static com.project.lessonlog.exception.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +46,7 @@ public class StudentService {
 
     public StudentDto getStudentById(Long userId, Long studentId) {
         Student student = studentRepository.findByIdAndUserId(studentId, userId)
-                .orElseThrow(() -> new StudentNotFoundException(studentId));
+                .orElseThrow(() -> new BusinessException(STUDENT_NOT_FOUND));
 
         return studentMapper.toStudentDto(student);
     }
@@ -52,7 +54,7 @@ public class StudentService {
     @Transactional
     public StudentDto registerStudent(Long userId, StudentRequest studentRequest) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+                .orElseThrow(() -> new BusinessException(USER_NOT_FOUND));
 
         Student student = studentMapper.createEntityFromRequest(user, studentRequest);
         Student saved = studentRepository.save(student);
@@ -62,7 +64,7 @@ public class StudentService {
     @Transactional
     public StudentDto updateStudent(Long userId, Long studentId, StudentRequest studentRequest) {
         Student student = studentRepository.findByIdAndUserId(studentId, userId)
-                .orElseThrow(() -> new StudentNotFoundException(studentId));
+                .orElseThrow(() -> new BusinessException(STUDENT_NOT_FOUND));
 
         student.updateStudent(studentRequest.getName(),
                 studentRequest.getInstrument(),
@@ -75,7 +77,7 @@ public class StudentService {
     @Transactional
     public void deleteStudent(Long userId, Long studentId) {
         Student student = studentRepository.findByIdAndUserId(studentId, userId)
-                .orElseThrow(() -> new StudentNotFoundException(studentId));
+                .orElseThrow(() -> new BusinessException(STUDENT_NOT_FOUND));
 
         lessonNoteRepository.deleteByStudentId(studentId);
         studentRepository.delete(student);

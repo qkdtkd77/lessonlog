@@ -1,8 +1,6 @@
 package com.project.lessonlog.exception;
 
-import com.project.lessonlog.exception.custom.*;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -14,68 +12,41 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import java.util.List;
 
+import static com.project.lessonlog.exception.ErrorCode.*;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static ResponseEntity<ErrorResponse> toResponse(ErrorCode errorCode) {
+        return ResponseEntity.status(errorCode.getStatus()).body(new ErrorResponse(errorCode.getMessage()));
+    }
+
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException e) {
+        return toResponse(e.getErrorCode());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        ErrorCode errorCode = INVALID_INPUT;
         List<String> errors = e.getFieldErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList();
-        return ResponseEntity.badRequest().body(new ErrorResponse("입력값 검증에 실패했습니다.", errors));
+        return ResponseEntity.status(errorCode.getStatus()).body(new ErrorResponse(errorCode.getMessage(), errors));
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
-        return ResponseEntity.badRequest().body(new ErrorResponse(String.format("'%s' 파라미터의 값 형식이 올바르지 않습니다.", e.getName())));
+        ErrorCode errorCode = INVALID_PARAMETER_TYPE;
+        return ResponseEntity.status(errorCode.getStatus())
+                .body(new ErrorResponse(String.format(errorCode.getMessage(), e.getName())));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
-        return ResponseEntity.badRequest().body(new ErrorResponse("요청 본문의 JSON 형식 또는 필드 타입이 올바르지 않습니다."));
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException() {
+        return toResponse(INVALID_REQUEST_BODY);
     }
 
-    @ExceptionHandler(StudentIdRequiredException.class)
-    public ResponseEntity<ErrorResponse> handleStudentIdRequiredException(StudentIdRequiredException e) {
-        return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
-
-    }
-
-    @ExceptionHandler(StudentNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleStudentNotFoundException(StudentNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
-    }
-
-    @ExceptionHandler(LessonNoteNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleLessonNoteNotFoundException(LessonNoteNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
-    }
-
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
-    }
-
-    @ExceptionHandler(InvalidPaginationException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidPaginationException(InvalidPaginationException e) {
-        return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
-    }
-
-    @ExceptionHandler(EmailDuplicatedException.class)
-    public ResponseEntity<ErrorResponse> handleEmailDuplicatedException(EmailDuplicatedException e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(e.getMessage()));
-    }
-
-    @ExceptionHandler(SelfDeletionNotAllowedException.class)
-    public ResponseEntity<ErrorResponse> handleSelfDeletionNotAllowedException(SelfDeletionNotAllowedException e) {
-        return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
-    }
-
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErrorResponse> handleBadCredentialsException() {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("이메일 또는 비밀번호가 올바르지 않습니다."));
-    }
-
-    @ExceptionHandler(DisabledException.class)
-    public ResponseEntity<ErrorResponse> handleDisabledException() {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("이메일 또는 비밀번호가 올바르지 않습니다."));
+    @ExceptionHandler({BadCredentialsException.class, DisabledException.class})
+    public ResponseEntity<ErrorResponse> handleLoginFailure() {
+        return toResponse(LOGIN_FAILED);
     }
 }
