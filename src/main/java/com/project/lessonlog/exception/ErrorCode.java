@@ -29,7 +29,9 @@ public enum ErrorCode {
     STUDENT_NOT_FOUND(NOT_FOUND, "학생을 찾을 수 없습니다."),
     LESSON_NOTE_NOT_FOUND(NOT_FOUND, "레슨 일지를 찾을 수 없습니다."),
 
-    EMAIL_DUPLICATED(CONFLICT, "이미 사용 중인 이메일입니다.");
+    EMAIL_DUPLICATED(CONFLICT, "이미 사용 중인 이메일입니다."),
+
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다.");
 
     private final HttpStatus status;
     private final String message;

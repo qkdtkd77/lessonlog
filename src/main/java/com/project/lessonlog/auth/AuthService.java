@@ -30,6 +30,6 @@ public class AuthService {
         );
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         String token = jwtProvider.createToken(Objects.requireNonNull(userDetails));
-        return new LoginResponse(token, "Bearer");
+        return new LoginResponse(token, "Bearer", userDetails.getRole());
     }
 }
