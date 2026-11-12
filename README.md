@@ -1,260 +1,174 @@
 # 🎵 LessonLog
 
-음악 레슨 강사가 학생 정보와 레슨 내용, 과제, 메모를 관리하기 위한 백엔드 프로젝트
+음악 레슨 선생님이 학생과 레슨 기록 (내용, 숙제, 메모)을 관리하는 백엔드 서비스
 
-직접 레슨을 진행하며 손으로 레슨일지를 쓰는 것이 불편했고, 개인 레슨에서는 결국 기록을 하지 않게 된 경험에서 시작했다. Java와 Spring Boot로 기능을 구현하고, 학습한 내용을 적용하며 실제 사용할 수 있는 서비스로 발전시키는 것을 목표로 한다.
+직접 레슨을 하면서 손으로 일지를 쓰는 게 불편했고, 개인 레슨에서는 결국 기록을 안 하게 된 경험에서 시작했다. 기능 구현에 그치지 않고, 설계 판단의 근거를 남기고 실제 트래픽 상황을 가정해 성능을 측정·개선하는
+것을 목표로 한다.
 
-**진행 상태:** 개발 중 · **문서 기준일:** 2026-09-30
-
-Student와 LessonNote의 CRUD(LessonNote 단건 조회 제외)를 구현했다. 저장·조회는 Spring Data JPA + H2 기반이며, 요청/응답은 DTO로 분리되어 API에 JPA 엔티티가 직접 노출되지 않는다. 목록 조회는 페이징을 지원하고, 예외는 도메인별 커스텀 예외와 전역 핸들러로 일관되게 응답한다.
-
----
-
-## 📋 구현 현황
-
-| 구분                            | 상태   | 내용                                                                 |
-|---------------------------------|--------|----------------------------------------------------------------------|
-| Student 관리                    | 구현   | 등록, 목록 조회(페이징), 상세 조회, 수정, 삭제                       |
-| Student 삭제                    | 구현   | 학생 삭제 시 해당 학생의 LessonNote를 함께 삭제 (단일 트랜잭션)      |
-| LessonNote 등록                 | 구현   | Student 존재 여부 확인 후 등록                                       |
-| LessonNote 목록 조회            | 구현   | Student별 조회, `lessonDate` 기준 정렬(기본 최신순), 페이징          |
-| LessonNote 수정 / 삭제          | 구현   | 조회 후 도메인 메서드로 상태 변경(변경 감지), 삭제                   |
-| LessonNote 단건 상세 조회       | 미구현 | -                                                                    |
-| JPA 기반 저장·조회              | 구현   | 인메모리 Repository 제거, `JpaRepository` 전환 완료                  |
-| Student–LessonNote 연관관계     | 구현   | `LessonNote.student` `@ManyToOne` (현재 기본 EAGER, LAZY 전환 예정)  |
-| 트랜잭션 / 변경 감지            | 구현   | 수정·삭제에 `@Transactional` 적용, 조회용 `readOnly`는 미적용        |
-| 요청 DTO / Validation           | 구현   | Request DTO + Bean Validation                                        |
-| 응답 DTO                        | 구현   | Request / Dto / Response 역할 분리, Entity 직접 노출 제거            |
-| Entity ↔ DTO 매핑               | 구현   | MapStruct Mapper                                                     |
-| 목록 페이징 / 정렬              | 구현   | `PageableFactory`, `PageResponse<T>` (페이지 크기는 서버 고정 10)    |
-| 전역 예외 처리                  | 구현   | 도메인별 커스텀 예외 + `ErrorResponse` + `GlobalExceptionHandler`    |
-| 감사 컬럼(createdAt/updatedAt)  | 미구현 | -                                                                    |
-| User / 인증·인가                | 미구현 | `user` 패키지에 뼈대 클래스만 존재, 엔티티·로직 없음                 |
-| 테스트 코드                     | 미구현 | `contextLoads` 1건만 존재, 수동 요청(`.http`)으로 확인               |
-| CI                              | 미구현 | -                                                                    |
+**진행 상태:** v1 개발 중 · **문서 기준일:** 2026-11-12
 
 ---
 
-## 🛠️ 기술 구성
+## 주요 기능
 
-| 영역              | 사용 기술                                          |
-|-------------------|----------------------------------------------------|
-| 언어              | Java 26 (Gradle toolchain 설정 기준)               |
-| 빌드              | Gradle 9.7.1 (Wrapper)                             |
-| 웹 / 애플리케이션 | Spring Boot 4.1.1, Spring MVC, Actuator            |
-| 영속성            | Spring Data JPA, Hibernate, H2 (인메모리)          |
-| 요청 검증         | Jakarta Bean Validation                            |
-| 객체 매핑         | MapStruct 1.6.3                                    |
-| 코드 작성 보조    | Lombok                                             |
-| 개발 및 리뷰      | Git, GitHub Issues / Pull Requests, CodeRabbit     |
+| 구분      | 기능                                                                  |
+|-----------|-----------------------------------------------------------------------|
+| 인증      | 회원가입, 로그인(JWT Access Token 발급), Bearer 토큰 기반 무상태 인증 |
+| 학생      | 등록, 목록(페이징·정렬), 상세, 수정, 삭제                             |
+| 레슨 일지 | 학생별 작성, 목록(최신순 페이징), 상세, 수정, 삭제                    |
+| 권한      | `ADMIN` / `TEACHER` 역할 분리, 선생님은 자기 학생·일지만 접근         |
+| 관리자    | 선생님 목록 조회, 선생님 탈퇴 처리(soft delete)                       |
 
-> H2는 현재 개발용으로 사용 중이며 MySQL 전환은 미완료다.
+## 기술 스택
 
----
-
-## 🧩 도메인
-
-| 도메인     | 주요 필드                                                | 역할                  |
-|------------|----------------------------------------------------------|-----------------------|
-| Student    | id, name, instrument, phone, memo                        | 학생 정보 관리        |
-| LessonNote | id, student, lessonDate, lessonContent, homework, memo   | 학생별 레슨 기록 관리 |
-
-- `LessonNote`는 `@ManyToOne`으로 `Student`를 참조한다 (`student_id`, not null). API 응답에서는 엔티티 대신 `studentId` 값만 노출한다.
-- 엔티티 상태 변경은 Setter 대신 `updateStudent()`, `updateLessonNote()` 도메인 메서드로만 수행하며, 서비스의 `@Transactional` 안에서 변경 감지(Dirty Checking)로 반영한다.
-- 엔티티 기본 생성자는 `protected`로 제한한다.
+| 영역        | 기술                                                          |
+|-------------|---------------------------------------------------------------|
+| 언어 / 빌드 | Java 26, Gradle                                               |
+| 프레임워크  | Spring Boot 4.1, Spring MVC, Spring Security, Spring Data JPA |
+| 인증        | JJWT 0.13 (HS256)                                             |
+| DB          | H2 (개발용, MySQL 전환 예정)                                  |
+| 기타        | MapStruct, Bean Validation, Lombok                            |
+| 협업        | GitHub Issues / PR, CodeRabbit 리뷰                           |
 
 ---
 
-## 🏗️ 현재 구조
+## 설계 포인트
 
-```
-HTTP 요청
-  → Controller     : Request DTO 수신, @Valid 검증, Response 구성
-  → Service        : 존재 여부 확인, 페이징 요청값 검증, 트랜잭션, DTO 변환 위임
-  → Repository     : JpaRepository (Spring Data JPA)
-  → H2 Database
-```
+**인증 실패와 권한 부족을 구분한다**
 
-```
-com.project.lessonlog
-├─ student/    controller · service · repository · domain · dto · mapper · config
-├─ lesson/     controller · service · repository · domain · dto · mapper · config
-├─ user/       뼈대 클래스만 존재 (미구현)
-├─ common/dto  PageResponse
-├─ exception/  커스텀 예외, ErrorResponse, GlobalExceptionHandler
-└─ util/       PageableFactory
-```
+- 토큰 없음·위조·만료·탈퇴 계정 토큰은 **401**, 권한 부족은 **403**으로 응답한다.
+- JWT 필터는 무효 토큰이어도 예외를 던지지 않고 인증 정보만 비운다. 차단 여부는 인가 설정이, 응답은 `AuthenticationEntryPoint`가 결정한다. 그래서 만료된 토큰이 남아 있어도 로그인 같은
+  공개 경로는 정상 통과한다.
+- 공개 경로는 `POST /api/auth/signup`, `POST /api/auth/login`만 명시적으로 허용한다.
 
-- Controller → Service → Repository로 역할을 분리한다. Repository는 Entity, Service는 Dto, Controller는 Response로 감싸 반환한다.
-- Entity ↔ Dto 변환은 MapStruct Mapper가 담당한다.
-- 단건 응답은 `StudentResponse` / `LessonNoteResponse`, 목록 응답은 `PageResponse<T>`를 사용한다.
-- 예외는 도메인별 커스텀 예외로 발생시키고 `GlobalExceptionHandler`에서 HTTP 응답으로 변환한다.
+**소유권은 조회 조건으로 검증한다**
 
----
+- 요청의 `userId`를 믿지 않고 인증 정보에서 사용자를 꺼낸다.
+- `findByIdAndUserId`처럼 조회 조건에 소유자를 넣고, 다른 사용자의 리소스는 존재 여부를 숨기기 위해 404로 응답한다.
 
-## 🔌 API
+**계정은 지우지 않고 탈퇴 처리한다**
 
-| 대상       | 메서드 | 경로                                | 기능                       |
-|------------|--------|-------------------------------------|----------------------------|
-| Student    | POST   | `/api/students`                     | 학생 등록                  |
-| Student    | GET    | `/api/students`                     | 학생 목록 조회 (페이징)    |
-| Student    | GET    | `/api/students/{studentId}`         | 학생 상세 조회             |
-| Student    | PUT    | `/api/students/{studentId}`         | 학생 수정                  |
-| Student    | DELETE | `/api/students/{studentId}`         | 학생 삭제 (레슨 기록 포함) |
-| LessonNote | POST   | `/api/students/{studentId}/lessons` | 레슨 기록 등록             |
-| LessonNote | GET    | `/api/students/{studentId}/lessons` | 학생별 목록 조회 (페이징)  |
-| LessonNote | PUT    | `/api/lessons/{lessonId}`           | 레슨 기록 수정             |
-| LessonNote | DELETE | `/api/lessons/{lessonId}`           | 레슨 기록 삭제             |
+- 선생님 탈퇴는 `deletedAt`만 기록하고 학생·일지 데이터는 보존한다.
+- 탈퇴 계정은 로그인 (`isEnabled`)과 이미 발급된 토큰 (필터의 사용자 조회 조건)을 모두 차단한다.
+- 로그인 실패는 비밀번호 오류와 탈퇴 계정을 같은 메시지로 응답해 계정 존재 여부를 노출하지 않는다.
 
-### 목록 조회 파라미터
+**에러 응답은 한 곳에서 관리한다**
 
-| 대상       | 파라미터     | 설명        | 비고                                                   |
-|------------|--------------|-------------|--------------------------------------------------------|
-| 공통       | `pageNumber` | 페이지 번호 | 1부터 시작, 내부에서 0-based로 보정. 기본값 1          |
-| LessonNote | `sortOrder`  | 정렬 방향   | `asc`, `desc`만 허용. 기본값 `desc` (`lessonDate` 기준) |
+- `ErrorCode`에 HTTP 상태와 메시지를 정의하고 `BusinessException`으로 던진다.
+- Security의 401·403 응답도 같은 `ErrorResponse` 형식과 `ErrorCode` 메시지를 쓴다.
 
-- 페이지 크기는 서버에서 10으로 고정한다.
-- Student 목록은 `id` 오름차순으로 고정한다.
-- 정렬 필드 화이트리스트와 검증 로직은 `PageableFactory`에 구현되어 있으며, 정렬 기준·페이지 크기를 클라이언트에 열 때 그대로 사용할 수 있다.
+**필요할 때만 추상화한다**
 
-### 요청 예시
-
-```http
-POST /api/students/1/lessons
-Content-Type: application/json
-
-{
-  "lessonDate": "2026-09-30",
-  "lessonContent": "슬랩 옥타브 패턴",
-  "homework": "옥타브 패턴 3개",
-  "memo": "손목 힘 빼기"
-}
-```
-
-필수 값: Student는 `name`, `instrument`, `phone`(하이픈 포함 13자, 예: `010-1234-5678`), LessonNote는 `lessonDate`, `lessonContent`, `homework`. `memo`는 선택이다.
+- 구현체가 하나뿐인 서비스 인터페이스는 두지 않는다.
+- 도메인 패키지 안에서는 `dto`만 하위 패키지로 나눈다.
+- DTO는 불변 record로 작성한다.
 
 ---
 
-## 📬 응답 형식
+## API
 
-단건 응답은 `data`로 감싼다.
+| 메서드             | 경로                                | 설명                         | 권한  |
+|--------------------|-------------------------------------|------------------------------|-------|
+| POST               | `/api/auth/signup`                  | 회원가입                     | 공개  |
+| POST               | `/api/auth/login`                   | 로그인, 토큰 발급            | 공개  |
+| GET                | `/api/students`                     | 내 학생 목록                 | 인증  |
+| POST               | `/api/students`                     | 학생 등록                    | 인증  |
+| GET · PUT · DELETE | `/api/students/{studentId}`         | 학생 상세 · 수정 · 삭제      | 인증  |
+| GET · POST         | `/api/students/{studentId}/lessons` | 레슨 일지 목록 · 작성        | 인증  |
+| GET · PUT · DELETE | `/api/lessons/{lessonId}`           | 레슨 일지 상세 · 수정 · 삭제 | 인증  |
+| GET                | `/api/admin/users`                  | 선생님 목록                  | ADMIN |
+| DELETE             | `/api/admin/users/{userId}`         | 선생님 탈퇴 처리             | ADMIN |
+
+목록 조회는 `pageNumber`(1부터), `pageSize`(최대 30)를 받는다. 학생 목록은 `sortBy`(`id`, `name`)와 `sortOrder`, 레슨 일지는 `sortOrder`(기준
+`lessonDate`)를 지원한다.
+
+### 에러 응답
 
 ```json
 {
-  "data": {
-    "id": 1,
-    "studentId": 1,
-    "lessonContent": "슬랩 옥타브 패턴",
-    "homework": "옥타브 패턴 3개",
-    "memo": "손목 힘 빼기",
-    "lessonDate": "2026-09-30"
-  }
+  "errorMessage": "학생을 찾을 수 없습니다."
 }
-```
-
-목록 응답은 `PageResponse`를 사용한다.
-
-```json
-{
-  "data": [ ... ],
-  "pageNumber": 1,
-  "pageSize": 10,
-  "totalElements": 10,
-  "totalPages": 1,
-  "lastPage": true
-}
-```
-
-에러 응답은 `ErrorResponse`로 통일한다. 단일 오류는 `errorMessage`만, Validation 실패는 `errors` 배열을 함께 반환한다.
-
-```json
-{ "errorMessage": "학생을 찾을 수 없습니다." }
 ```
 
 ```json
 {
   "errorMessage": "입력값 검증에 실패했습니다.",
-  "errors": ["이름을 입력해주세요.", "악기를 입력해주세요."]
+  "errors": [
+    "이름을 입력해주세요."
+  ]
 }
 ```
 
-| 상황                                        | 응답                                                  |
-|---------------------------------------------|-------------------------------------------------------|
-| 조회·수정 성공                              | 200 OK                                                |
-| 등록 성공                                   | 201 Created                                           |
-| 삭제 성공                                   | 204 No Content                                        |
-| Validation 실패                             | 400 Bad Request (`errors`에 필드별 메시지)            |
-| 요청 본문 JSON 형식·필드 타입 오류          | 400 Bad Request (`lessonDate` 형식 오류 포함)         |
-| 경로·파라미터 타입 오류                     | 400 Bad Request                                       |
-| 잘못된 페이징·정렬 요청값                   | 400 Bad Request (`InvalidPaginationException`)        |
-| Student / LessonNote 미존재                 | 404 Not Found                                         |
-
-내부 예외 메시지는 그대로 노출하지 않고 예외별로 정의한 고정 메시지를 반환한다.
+| 상태 | 상황                                                    |
+|------|---------------------------------------------------------|
+| 400  | 입력값 검증 실패, 잘못된 페이징·정렬 값, JSON 형식 오류 |
+| 401  | 토큰 없음·무효·만료, 로그인 실패                        |
+| 403  | 권한 부족                                               |
+| 404  | 리소스 없음 또는 다른 사용자의 리소스                   |
+| 409  | 이메일 중복                                             |
 
 ---
 
-## 🔍 코드 리뷰와 개선
-
-CodeRabbit PR 리뷰를 검토하여 반영한 주요 내용:
-
-- 잘못된 `lessonDate` 입력이 500 응답으로 이어질 가능성을 확인하고 입력 검증 및 400 처리 추가
-- `GlobalExceptionHandler`가 내부 예외 메시지를 그대로 반환하던 문제를 확인하고 예외별 고정 메시지로 분리
-- 인메모리 저장소 시절의 `HashMap` 동시성 문제를 `ConcurrentHashMap`으로 보완하고 `studentId` 사전 검증 추가 (이후 JPA 전환으로 대체)
-
-이후 직접 리팩터링한 내용:
-
-- Repository JPA 전환, 엔티티 `id` Setter 제거
-- Request / Dto / Response 분리, MapStruct 적용
-- `Student`–`LessonNote` 연관관계 매핑, 수정·삭제에 트랜잭션과 변경 감지 적용
-- 페이징 조회 로직을 `PageableFactory`로 공통화
-
----
-
-## 🔄 개발 방식
+## 패키지 구조
 
 ```
-GitHub Issue
-  → 기능 브랜치
-  → 기능 단위 Commit
-  → Pull Request
-  → CodeRabbit 리뷰
-  → 리뷰 검토 및 수정
-  → dev 병합
+com.project.lessonlog
+├─ auth       로그인
+├─ user       회원가입, 관리자 API, User, UserRole
+├─ student    학생
+├─ lesson     레슨 일지
+├─ security   JWT 필터·발급, 401/403 응답 처리
+├─ config     SecurityConfig, 공통 상수
+├─ exception  ErrorCode, BusinessException, 전역 예외 처리
+└─ util       PageableFactory
 ```
 
-날짜별로 구현 내용, 설계 판단, 트러블슈팅을 개발일지로 정리한다. 리뷰 기록은 발견한 문제와 검토 결과, 실제 반영 내용을 중심으로 남긴다.
+각 도메인 패키지는 Entity, Controller, Service, Repository, Mapper와 `dto/`로 구성된다.
 
 ---
 
-## ⚠️ 알려진 한계
+## 실행 방법
 
-현재 코드 기준으로 확인된 개선 대상이다.
+JWT 서명 키를 환경변수로 넣어야 한다. (32바이트 이상)
 
-- `lessonContent`, `homework`, `memo`에 길이 제한이 없어 기본 컬럼 길이(255자)를 넘으면 DB 예외가 발생한다.
-- 전화번호 검증이 길이(13자)만 확인하며 형식은 검증하지 않는다.
-- 존재하지 않는 학생의 레슨 목록을 조회하면 404가 아닌 빈 목록(200)이 반환된다.
-- `lessonDate`만으로 정렬해 같은 날짜의 기록이 여러 개면 페이지 간 순서가 보장되지 않는다.
-- 정의하지 않은 예외에 대한 폴백 핸들러가 없어 `ErrorResponse` 형식이 아닌 기본 에러 응답이 나갈 수 있다.
-- `@ManyToOne` 기본 fetch(EAGER) 사용, 조회 메서드에 `readOnly` 트랜잭션 미적용.
-- `data.sql`이 H2 전용 문법을 사용하고, `application.yaml`이 개발용 설정(`create-drop`, `show-sql`, H2 콘솔) 단일 구성이다.
+```bash
+export JWT_SECRET=$(openssl rand -base64 32)
+./gradlew bootRun
+```
 
----
+H2 인메모리 DB를 사용하며 시작 시 `data.sql`로 테스트 데이터가 들어간다.
 
-## 🗓️ 향후 작업
-
-- [ ] 위 "알려진 한계" 정리
-- [ ] 테스트 코드 작성 (Service 단위, Repository, Controller 검증·에러 응답) 및 GitHub Actions CI
-- [ ] LessonNote 단건 상세 조회 구현
-- [ ] `@ManyToOne(LAZY)` 전환 및 조회용 `@Transactional(readOnly = true)` 적용
-- [ ] `createdAt`, `updatedAt` 추가
-- [ ] User 도메인 및 JWT 인증·인가, 강사별 데이터 소유권 검증
-- [ ] 프로필 분리(`local` / `prod`) 및 MySQL 전환
-- [ ] 검색·필터 기능 및 필요 시 QueryDSL 검토
-- [ ] 서비스 배포
-- [ ] React + TypeScript 클라이언트 (선택)
+| 계정                | 비밀번호 | 역할                |
+|---------------------|----------|---------------------|
+| `teacher1@test.com` | `1234`   | TEACHER (학생 1, 2) |
+| `teacher2@test.com` | `1234`   | TEACHER (학생 3, 4) |
+| `admin@test.com`    | `1234`   | ADMIN               |
 
 ---
 
-## 📝 문서 기준
+## 개발 방식
 
-이 문서는 2026-09-30 기준 저장소 소스(`build.gradle`, `src/main`, `src/test`)를 직접 읽고 작성했다. 빌드·실행·테스트 결과는 별도로 검증하지 않았다.
+```
+Issue → Branch → Commit → Pull Request → CodeRabbit 리뷰 → 리뷰 분류 및 반영 → dev 병합
+```
+
+CodeRabbit 리뷰는 그대로 수용하지 않고 "이번 PR에서 수정 / 다음 작업 / 보류"로 나눠 판단한다.
+
+---
+
+## 알려진 한계
+
+- Student 삭제는 아직 물리 삭제다. (soft delete 전환 예정)
+- `LessonNote.student`가 기본 EAGER 로딩이다.
+- `lessonContent`, `homework`, `memo`에 길이 제한이 없다.
+- 같은 날짜의 레슨 일지는 페이지 간 순서가 보장되지 않는다.
+- 로그아웃은 클라이언트가 토큰을 삭제하는 방식이라, 탈취된 토큰은 만료 (1시간)까지 유효하다.
+- 자동화 테스트가 없다. 현재는 Postman / curl로 검증한다.
+
+## 다음 단계
+
+- [ ] Student soft delete → v1 기능 완료
+- [ ] 정리 작업: N+1 점검, LAZY 전환, 엔티티 검증 정리
+- [ ] MySQL 전환, 배포
+- [ ] LessonNote 약 20만 건 데이터 구성, Prometheus · Grafana 관측 환경
+- [ ] 수업 종료 직후 요청이 몰리는 상황을 k6로 재현해 병목 분석 · 개선 · 재측정
