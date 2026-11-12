@@ -1,7 +1,6 @@
 package com.project.lessonlog.student;
 
 import com.project.lessonlog.exception.BusinessException;
-import com.project.lessonlog.lesson.LessonNoteRepository;
 import com.project.lessonlog.student.dto.StudentDto;
 import com.project.lessonlog.student.dto.StudentRequest;
 import com.project.lessonlog.student.dto.StudentResponse;
@@ -26,14 +25,13 @@ public class StudentService {
 
     private static final List<String> SORTABLE_FIELDS = List.of("id", "name");
     private final StudentRepository studentRepository;
-    private final LessonNoteRepository lessonNoteRepository;
     private final UserRepository userRepository;
     private final StudentMapper studentMapper;
 
     public StudentResponse getAllStudents(Long userId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         Pageable pageDetails = PageableFactory.createWithTieBreaker(
                 pageNumber, pageSize, sortBy, sortOrder, SORTABLE_FIELDS, "id");
-        Page<Student> studentPage = studentRepository.findByUser_Id(userId, pageDetails);
+        Page<Student> studentPage = studentRepository.findByUserIdAndDeletedAtIsNull(userId, pageDetails);
         List<Student> students = studentPage.getContent();
 
         return new StudentResponse(studentMapper.toStudentDtoList(students),
@@ -45,7 +43,7 @@ public class StudentService {
     }
 
     public StudentDto getStudentById(Long userId, Long studentId) {
-        Student student = studentRepository.findByIdAndUserId(studentId, userId)
+        Student student = studentRepository.findByIdAndUserIdAndDeletedAtIsNull(studentId, userId)
                 .orElseThrow(() -> new BusinessException(STUDENT_NOT_FOUND));
 
         return studentMapper.toStudentDto(student);
@@ -63,7 +61,7 @@ public class StudentService {
 
     @Transactional
     public StudentDto updateStudent(Long userId, Long studentId, StudentRequest studentRequest) {
-        Student student = studentRepository.findByIdAndUserId(studentId, userId)
+        Student student = studentRepository.findByIdAndUserIdAndDeletedAtIsNull(studentId, userId)
                 .orElseThrow(() -> new BusinessException(STUDENT_NOT_FOUND));
 
         student.updateStudent(studentRequest.name(),
@@ -76,10 +74,9 @@ public class StudentService {
 
     @Transactional
     public void deleteStudent(Long userId, Long studentId) {
-        Student student = studentRepository.findByIdAndUserId(studentId, userId)
+        Student student = studentRepository.findByIdAndUserIdAndDeletedAtIsNull(studentId, userId)
                 .orElseThrow(() -> new BusinessException(STUDENT_NOT_FOUND));
 
-        lessonNoteRepository.deleteByStudentId(studentId);
-        studentRepository.delete(student);
+        student.delete();
     }
 }

@@ -10,9 +10,9 @@ import java.util.Optional;
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Long> {
 
-    Page<Student> findByUser_Id(Long userId, Pageable pageable);
+    Page<Student> findByUserIdAndDeletedAtIsNull(Long userId, Pageable pageable);
+    
+    boolean existsByIdAndUserIdAndDeletedAtIsNull(Long studentId, Long userId);
 
-    Optional<Student> findByIdAndUserId(Long studentId, Long userId);
-
-    boolean existsByIdAndUserId(Long studentId, Long userId);
+    Optional<Student> findByIdAndUserIdAndDeletedAtIsNull(Long studentId, Long userId);
 }
