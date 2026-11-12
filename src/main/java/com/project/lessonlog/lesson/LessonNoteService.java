@@ -30,7 +30,7 @@ public class LessonNoteService {
     private final LessonNoteMapper lessonNoteMapper;
 
     public LessonNoteResponse getAllLessonNotes(Long userId, Long studentId, Integer pageNumber, Integer pageSize, String sortOrder) {
-        if (!studentRepository.existsByIdAndUserId(studentId, userId)) {
+        if (!studentRepository.existsByIdAndUserIdAndDeletedAtIsNull(studentId, userId)) {
             throw new BusinessException(STUDENT_NOT_FOUND);
         }
         Pageable pageDetails = PageableFactory.create(pageNumber, pageSize, SORTABLE_FIELD, sortOrder);
@@ -82,12 +82,12 @@ public class LessonNoteService {
     }
 
     private @NonNull LessonNote findLessonNoteByUserId(Long userId, Long lessonId) {
-        return lessonNoteRepository.findByIdAndStudentUserId(lessonId, userId).orElseThrow(
+        return lessonNoteRepository.findByIdAndStudentUserIdAndStudentDeletedAtIsNull(lessonId, userId).orElseThrow(
                 () -> new BusinessException(LESSON_NOTE_NOT_FOUND));
     }
 
     private @NonNull Student findStudentByUserId(Long userId, Long studentId) {
-        return studentRepository.findByIdAndUserId(studentId, userId).orElseThrow(
+        return studentRepository.findByIdAndUserIdAndDeletedAtIsNull(studentId, userId).orElseThrow(
                 () -> new BusinessException(STUDENT_NOT_FOUND));
     }
 }

@@ -9,11 +9,8 @@ import java.util.Optional;
 
 @Repository
 public interface LessonNoteRepository extends JpaRepository<LessonNote, Long> {
-    Page<LessonNote> findByStudentId(Long studentId, Pageable pageable);
-
-    void deleteByStudentId(Long studentId);
 
     Page<LessonNote> findByStudentUserIdAndStudentId(Long userId, Long studentId, Pageable pageDetails);
 
-    Optional<LessonNote> findByIdAndStudentUserId(Long lessonId, Long userId);
+    Optional<LessonNote> findByIdAndStudentUserIdAndStudentDeletedAtIsNull(Long lessonId, Long userId);
 }
