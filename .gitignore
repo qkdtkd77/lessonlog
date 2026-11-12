@@ -40,4 +40,5 @@ src/main/generated/
 ### macOS ###
 .DS_Store
 
-FETCH_HEADscripts/
+FETCH_HEAD
+scripts/

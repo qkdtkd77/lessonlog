@@ -1,19 +1,8 @@
 package com.project.lessonlog.student.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class StudentDto {
-    private Long id;
-    private Long userId;
-    private String name;
-    private String instrument;
-    private String phone;
-    private String memo;
+@JsonPropertyOrder({"id", "userId", "name", "instrument", "phone", "memo"})
+public record StudentDto(Long id, Long userId, String name, String instrument,
+                         String phone, String memo) {
 }

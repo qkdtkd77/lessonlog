@@ -1,8 +1,6 @@
 package com.project.lessonlog.user;
 
-import com.project.lessonlog.exception.custom.EmailDuplicatedException;
-import com.project.lessonlog.exception.custom.SelfDeletionNotAllowedException;
-import com.project.lessonlog.exception.custom.UserNotFoundException;
+import com.project.lessonlog.exception.BusinessException;
 import com.project.lessonlog.user.dto.UserRequest;
 import com.project.lessonlog.user.dto.UserResponse;
 import com.project.lessonlog.util.PageableFactory;
@@ -15,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.project.lessonlog.exception.ErrorCode.*;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -26,14 +26,14 @@ public class UserService {
 
     @Transactional
     public void createUser(UserRequest userRequest) {
-        String normalizedEmail = userRequest.getEmail()
+        String normalizedEmail = userRequest.email()
                 .trim()
                 .toLowerCase();
         if (userRepository.existsByEmail(normalizedEmail)) {
-            throw new EmailDuplicatedException("Email already exists");
+            throw new BusinessException(EMAIL_DUPLICATED);
         }
 
-        String encodedPassword = passwordEncoder.encode(userRequest.getPassword());
+        String encodedPassword = passwordEncoder.encode(userRequest.password());
         User userEntity = userMapper.toEntity(userRequest, normalizedEmail, encodedPassword);
         userRepository.save(userEntity);
     }
@@ -54,11 +54,11 @@ public class UserService {
     @Transactional
     public void deleteUser(Long adminId, Long userId) {
         if (adminId.equals(userId)) {
-            throw new SelfDeletionNotAllowedException();
+            throw new BusinessException(SELF_DELETION_NOT_ALLOWED);
         }
 
         User user = userRepository.findByIdAndRoleAndDeletedAtIsNull(userId, UserRole.TEACHER).orElseThrow(
-                () -> new UserNotFoundException(userId));
+                () -> new BusinessException(USER_NOT_FOUND));
 
         user.delete();
     }

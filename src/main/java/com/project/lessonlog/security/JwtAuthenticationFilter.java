@@ -1,6 +1,5 @@
 package com.project.lessonlog.security;
 
-import com.project.lessonlog.exception.custom.UserNotFoundException;
 import com.project.lessonlog.user.User;
 import com.project.lessonlog.user.UserRepository;
 import io.jsonwebtoken.Claims;
@@ -58,12 +57,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Claims claims = jwtProvider.parseToken(token);
 
                 Long userId = Long.valueOf(claims.getSubject());
-                User user = userRepository.findByIdAndDeletedAtIsNull(userId).orElseThrow(
-                        () -> new UserNotFoundException(userId));
 
-                UsernamePasswordAuthenticationToken authentication = getUsernamePasswordAuthenticationToken(user);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } catch (JwtException | UserNotFoundException e) {
+                userRepository.findByIdAndDeletedAtIsNull(userId).ifPresent(
+                        user -> SecurityContextHolder.getContext()
+                                .setAuthentication(getUsernamePasswordAuthenticationToken(user)));
+            } catch (JwtException e) {
                 SecurityContextHolder.clearContext();
             }
         }

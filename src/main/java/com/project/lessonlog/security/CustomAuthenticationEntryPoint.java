@@ -1,5 +1,6 @@
 package com.project.lessonlog.security;
 
+import com.project.lessonlog.exception.ErrorCode;
 import com.project.lessonlog.exception.ErrorResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +15,8 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
+import static com.project.lessonlog.exception.ErrorCode.AUTHENTICATION_FAILED;
+
 @Component
 @RequiredArgsConstructor
 @NullMarked
@@ -23,10 +26,11 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        ErrorCode errorCode = AUTHENTICATION_FAILED;
+        response.setStatus(errorCode.getStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
-        objectMapper.writeValue(response.getWriter(), new ErrorResponse("인증에 실패했습니다."));
+        objectMapper.writeValue(response.getWriter(), new ErrorResponse(errorCode.getMessage()));
     }
 }
 

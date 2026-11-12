@@ -1,11 +1,7 @@
 package com.project.lessonlog.auth.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-@Getter
-@AllArgsConstructor
-public class LoginResponse {
-    private String accessToken;
-    private String tokenType;
+@JsonPropertyOrder({"accessToken", "tokenType"})
+public record LoginResponse(String accessToken, String tokenType) {
 }
