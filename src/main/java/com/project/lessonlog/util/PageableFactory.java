@@ -42,7 +42,7 @@ public final class PageableFactory {
         Sort sort = Sort.by(direction, sortBy);
 
         if (!tieBreaker.equals(sortBy)) {
-            sort = sort.and(Sort.by(Sort.Direction.ASC, tieBreaker));
+            sort = sort.and(Sort.by(direction, tieBreaker));
         }
 
         return PageRequest.of(pageNumber - 1, pageSize, sort);

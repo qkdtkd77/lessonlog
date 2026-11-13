@@ -33,7 +33,8 @@ public class LessonNoteService {
         if (!studentRepository.existsByIdAndUserIdAndDeletedAtIsNull(studentId, userId)) {
             throw new BusinessException(STUDENT_NOT_FOUND);
         }
-        Pageable pageDetails = PageableFactory.create(pageNumber, pageSize, SORTABLE_FIELD, sortOrder);
+        Pageable pageDetails = PageableFactory.createWithTieBreaker(
+                pageNumber, pageSize, SORTABLE_FIELD, sortOrder, List.of(SORTABLE_FIELD), "id");
         Page<LessonNote> lessonNotePage = lessonNoteRepository.findByStudentUserIdAndStudentId(userId, studentId, pageDetails);
         List<LessonNote> lessonNotes = lessonNotePage.getContent();
 
