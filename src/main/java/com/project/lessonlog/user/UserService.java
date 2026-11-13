@@ -5,6 +5,7 @@ import com.project.lessonlog.user.dto.UserRequest;
 import com.project.lessonlog.user.dto.UserResponse;
 import com.project.lessonlog.util.PageableFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,7 +36,12 @@ public class UserService {
 
         String encodedPassword = passwordEncoder.encode(userRequest.password());
         User userEntity = userMapper.toEntity(userRequest, normalizedEmail, encodedPassword);
-        userRepository.save(userEntity);
+
+        try {
+            userRepository.saveAndFlush(userEntity);
+        } catch (DataIntegrityViolationException e) {
+            throw new BusinessException(EMAIL_DUPLICATED);
+        }
     }
 
     public UserResponse getUsers(Integer pageNumber, Integer pageSize) {
