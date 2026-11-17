@@ -18,6 +18,9 @@ repositories {
     mavenCentral()
 }
 
+ext['jackson-2-bom.version'] = '2.21.8'
+ext['jackson-bom.version'] = '3.1.8'
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-h2console'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -27,6 +30,7 @@ dependencies {
     implementation 'org.mapstruct:mapstruct:1.6.3'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'io.jsonwebtoken:jjwt-api:0.13.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.1.1'
     testImplementation 'org.springframework.security:spring-security-test'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -44,7 +48,7 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
-tasks.named('test') {
+tasks.named('test', Test) {
     useJUnitPlatform()
     environment 'JWT_SECRET', 'test-only-secret-key-for-lessonlog-0123456789'
 }

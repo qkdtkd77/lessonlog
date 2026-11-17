@@ -1,5 +1,6 @@
 package com.project.lessonlog.auth;
 
+import com.project.lessonlog.auth.docs.AuthControllerDocs;
 import com.project.lessonlog.auth.dto.LoginRequest;
 import com.project.lessonlog.auth.dto.LoginResponse;
 import com.project.lessonlog.user.UserService;
@@ -16,16 +17,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-public class AuthController {
+public class AuthController implements AuthControllerDocs {
 
     private final AuthService authService;
     private final UserService userService;
 
+    @Override
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
         return ResponseEntity.ok(authService.login(loginRequest));
     }
 
+    @Override
     @PostMapping("/signup")
     public ResponseEntity<Void> signup(@Valid @RequestBody UserRequest userRequest) {
         userService.createUser(userRequest);

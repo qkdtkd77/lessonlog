@@ -1,6 +1,7 @@
 package com.project.lessonlog.user;
 
 import com.project.lessonlog.security.CustomUserDetails;
+import com.project.lessonlog.user.docs.UserControllerDocs;
 import com.project.lessonlog.user.dto.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,10 +14,11 @@ import static com.project.lessonlog.config.AppConstant.DEFAULT_PAGE_SIZE;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/users")
-public class UserController {
+public class UserController implements UserControllerDocs {
 
     private final UserService userService;
 
+    @Override
     @GetMapping
     public ResponseEntity<UserResponse> getUsers(
             @RequestParam(value = "pageNumber", defaultValue = DEFAULT_PAGE_NUMBER) Integer pageNumber,
@@ -26,6 +28,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @Override
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,

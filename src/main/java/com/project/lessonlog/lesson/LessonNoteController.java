@@ -1,5 +1,6 @@
 package com.project.lessonlog.lesson;
 
+import com.project.lessonlog.lesson.docs.LessonNoteControllerDocs;
 import com.project.lessonlog.lesson.dto.LessonNoteDto;
 import com.project.lessonlog.lesson.dto.LessonNoteRequest;
 import com.project.lessonlog.lesson.dto.LessonNoteResponse;
@@ -16,10 +17,11 @@ import static com.project.lessonlog.config.AppConstant.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class LessonNoteController {
+public class LessonNoteController implements LessonNoteControllerDocs {
 
     private final LessonNoteService lessonNoteService;
 
+    @Override
     @GetMapping("/students/{studentId}/lessons")
     public ResponseEntity<LessonNoteResponse> getAllLessonNotes(
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -33,6 +35,7 @@ public class LessonNoteController {
         return ResponseEntity.ok(allLessonNotes);
     }
 
+    @Override
     @GetMapping("/lessons/{lessonId}")
     public ResponseEntity<LessonNoteDto> getLessonNoteById(
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -42,6 +45,7 @@ public class LessonNoteController {
     }
 
 
+    @Override
     @PostMapping("/students/{studentId}/lessons")
     public ResponseEntity<LessonNoteDto> createLessonNote(
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -51,6 +55,7 @@ public class LessonNoteController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedLessonNote);
     }
 
+    @Override
     @PutMapping("/lessons/{lessonId}")
     public ResponseEntity<LessonNoteDto> updateLessonNote(
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -60,6 +65,7 @@ public class LessonNoteController {
         return ResponseEntity.ok(updatedLessonNote);
     }
 
+    @Override
     @DeleteMapping("/lessons/{lessonId}")
     public ResponseEntity<Void> deleteLessonNote(
             @AuthenticationPrincipal CustomUserDetails userDetails,

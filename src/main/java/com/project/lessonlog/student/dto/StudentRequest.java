@@ -1,6 +1,7 @@
 package com.project.lessonlog.student.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record StudentRequest(
@@ -13,7 +14,7 @@ public record StudentRequest(
         String instrument,
 
         @NotBlank(message = "전화번호를 입력해주세요.")
-        @Size(min = 13, max = 13, message = "올바르지 않은 전화번호입니다.")
+        @Pattern(regexp = "^010-\\d{4}-\\d{4}$", message = "전화번호는 010-0000-0000 형식으로 입력해주세요.")
         String phone,
 
         @Size(max = 500)

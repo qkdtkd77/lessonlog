@@ -2,6 +2,7 @@ package com.project.lessonlog.student;
 
 import com.project.lessonlog.config.AppConstant;
 import com.project.lessonlog.security.CustomUserDetails;
+import com.project.lessonlog.student.docs.StudentControllerDocs;
 import com.project.lessonlog.student.dto.StudentDto;
 import com.project.lessonlog.student.dto.StudentRequest;
 import com.project.lessonlog.student.dto.StudentResponse;
@@ -18,10 +19,11 @@ import static com.project.lessonlog.config.AppConstant.DEFAULT_PAGE_SIZE;
 @RestController
 @RequestMapping("/api/students")
 @RequiredArgsConstructor
-public class StudentController {
+public class StudentController implements StudentControllerDocs {
 
     private final StudentService studentService;
 
+    @Override
     @GetMapping
     public ResponseEntity<StudentResponse> getAllStudents(
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -35,6 +37,7 @@ public class StudentController {
         return ResponseEntity.ok(allStudents);
     }
 
+    @Override
     @GetMapping("/{studentId}")
     public ResponseEntity<StudentDto> getStudentById(
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -43,6 +46,7 @@ public class StudentController {
         return ResponseEntity.ok(studentById);
     }
 
+    @Override
     @PostMapping
     public ResponseEntity<StudentDto> registerStudent(
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -51,6 +55,7 @@ public class StudentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedStudent);
     }
 
+    @Override
     @PutMapping("/{studentId}")
     public ResponseEntity<StudentDto> updateStudent(
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -60,6 +65,7 @@ public class StudentController {
         return ResponseEntity.ok(updatedStudent);
     }
 
+    @Override
     @DeleteMapping("/{studentId}")
     public ResponseEntity<Void> deleteStudent(
             @AuthenticationPrincipal CustomUserDetails userDetails,
