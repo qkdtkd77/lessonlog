@@ -16,13 +16,20 @@ public class LessonNote {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
+    @Column(nullable = false, length = 1000)
     private String lessonContent;
+
+    @Column(nullable = false, length = 500)
     private String homework;
+
+    @Column(length = 500)
     private String memo;
+
+    @Column(nullable = false)
     private LocalDate lessonDate;
 
     public LessonNote(Student student, String lessonContent, String homework, String memo, LocalDate lessonDate) {

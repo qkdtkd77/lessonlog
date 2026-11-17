@@ -1,5 +1,6 @@
 package com.project.lessonlog.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -15,6 +16,7 @@ import java.util.List;
 import static com.project.lessonlog.exception.ErrorCode.*;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     private static ResponseEntity<ErrorResponse> toResponse(ErrorCode errorCode) {
@@ -48,5 +50,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({BadCredentialsException.class, DisabledException.class})
     public ResponseEntity<ErrorResponse> handleLoginFailure() {
         return toResponse(LOGIN_FAILED);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleException(Exception e) {
+        if (e instanceof org.springframework.web.ErrorResponse springError) {
+            return ResponseEntity.status(springError.getStatusCode()).body(new ErrorResponse(springError.getBody().getDetail()));
+        }
+        log.error("처리되지 않은 예외", e);
+        return toResponse(INTERNAL_SERVER_ERROR);
     }
 }
