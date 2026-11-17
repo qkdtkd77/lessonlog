@@ -77,7 +77,7 @@
 **필요할 때만 추상화한다**
 
 - 구현체가 하나뿐인 서비스 인터페이스는 두지 않는다.
-- 도메인 패키지 안에서는 `dto`만 하위 패키지로 나눈다.
+- 도메인 패키지 안에서는 `dto`와 Swagger 문서용 `docs`만 하위 패키지로 나눈다.
 - DTO는 불변 record로 작성한다.
 
 ---
@@ -136,12 +136,12 @@ com.project.lessonlog
 ├─ student    학생
 ├─ lesson     레슨 일지
 ├─ security   JWT 필터와 발급, 401/403 응답 처리
-├─ config     SecurityConfig, 공통 상수
+├─ config     SecurityConfig, SwaggerConfig, 공통 상수
 ├─ exception  ErrorCode, BusinessException, 전역 예외 처리
 └─ util       PageableFactory
 ```
 
-각 도메인 패키지는 Entity, Controller, Service, Repository, Mapper와 `dto/`로 구성된다.
+각 도메인 패키지는 Entity, Controller, Service, Repository, Mapper와 `dto/`, `docs/`로 구성된다. Swagger 애노테이션은 `docs/`의 인터페이스에 두고 컨트롤러가 구현한다.
 
 ---
 
@@ -155,6 +155,8 @@ export JWT_SECRET=$(openssl rand -base64 32)
 ```
 
 H2 인메모리 DB를 사용하며 시작 시 `data.sql`로 테스트 데이터가 들어간다.
+
+API 문서는 실행 후 `http://localhost:8080/swagger-ui/index.html`에서 볼 수 있다. 로그인 API로 받은 토큰을 우측 상단 Authorize에 넣으면 인증이 필요한 API도 호출할 수 있다.
 
 | 계정                | 비밀번호 | 역할                |
 |---------------------|----------|---------------------|
@@ -183,7 +185,8 @@ CodeRabbit 리뷰는 그대로 수용하지 않고 "이번 PR에서 수정 / 다
 ## 다음 단계
 
 - [x] v1 기능 완료, 안정화 (예외 응답, 입력 제약, 권한 정리, LAZY 전환)
-- [ ] Swagger 문서화, 전화번호 형식 검증
+- [x] Swagger 문서화
+- [ ] 전화번호 형식 검증
 - [ ] MySQL 전환, 배포
 - [ ] LessonNote 약 20만 건 데이터 구성, Prometheus와 Grafana 관측 환경
 - [ ] 수업 종료 직후 요청이 몰리는 상황을 k6로 재현해 병목 분석, 개선, 재측정
