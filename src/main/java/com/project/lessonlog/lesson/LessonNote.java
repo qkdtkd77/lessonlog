@@ -29,7 +29,7 @@ public class LessonNote {
     @Column(length = 500)
     private String memo;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     private LocalDate lessonDate;
 
     public LessonNote(Student student, String lessonContent, String homework, String memo, LocalDate lessonDate) {
