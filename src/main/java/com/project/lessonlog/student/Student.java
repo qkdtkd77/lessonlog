@@ -23,7 +23,6 @@ public class Student {
     @Column(nullable = false, length = 30)
     private String instrument;
 
-    // TODO: 전화번호 검증 방식 변경
     @Column(nullable = false, length = 13)
     private String phone;
 
