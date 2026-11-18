@@ -1,0 +1,9 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  sql:
+    init:
+      mode: never
+jwt:
+  secret: test-only-secret-key-for-lessonlog-0123456789
