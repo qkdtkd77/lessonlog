@@ -26,7 +26,7 @@
 | 언어 / 빌드 | Java 25 (LTS), Gradle                                         |
 | 프레임워크  | Spring Boot 4.1, Spring MVC, Spring Security, Spring Data JPA |
 | 인증        | JJWT 0.13 (HS256)                                             |
-| DB          | H2 (개발용, MySQL 전환 예정)                                  |
+| DB          | MySQL (Docker), 테스트는 Testcontainers                       |
 | 기타        | MapStruct, Bean Validation, Lombok                            |
 | 협업        | GitHub Issues / PR, CodeRabbit 리뷰                           |
 
@@ -147,14 +147,48 @@ com.project.lessonlog
 
 ## 실행 방법
 
-JWT 서명 키를 환경변수로 넣어야 한다. (32바이트 이상)
+Docker가 필요하다. 로컬 DB와 테스트 DB 모두 MySQL 컨테이너를 사용한다.
+
+**1. 환경변수 파일 만들기**
+
+`.env.example`을 복사해 `.env`를 만들고 값을 채운다. `.env`는 Git에 올라가지 않는다.
 
 ```bash
-export JWT_SECRET=$(openssl rand -base64 32)
+cp .env.example .env
+```
+
+| 변수                  | 설명                                     |
+|-----------------------|------------------------------------------|
+| `MYSQL_ROOT_PASSWORD` | MySQL root 비밀번호                      |
+| `DB_USERNAME`         | 애플리케이션 접속 계정                   |
+| `DB_PASSWORD`         | 애플리케이션 접속 비밀번호               |
+| `JWT_SECRET`          | JWT 서명 키 (32바이트 이상)              |
+
+JWT 서명 키는 `openssl rand -base64 32`로 만들 수 있다.
+
+**2. MySQL 실행**
+
+```bash
+docker compose up -d
+```
+
+`compose.yml`이 `.env`를 읽어 MySQL을 `localhost:3300`에 띄운다.
+
+**3. 서버 실행**
+
+```bash
 ./gradlew bootRun
 ```
 
-H2 인메모리 DB를 사용하며 시작 시 `data.sql`로 테스트 데이터가 들어간다.
+기본 프로필은 `local`이다. `local` 프로필은 `.env`를 읽어 MySQL에 접속하고, 시작할 때마다 테이블을 새로 만든 뒤 `data.sql`로 테스트 데이터를 넣는다.
+
+**4. 테스트**
+
+```bash
+./gradlew test
+```
+
+테스트는 `test` 프로필로 실행되며 Testcontainers가 별도 MySQL 컨테이너를 띄웠다가 종료 후 정리한다. 로컬 MySQL을 켜 둘 필요는 없다.
 
 API 문서는 실행 후 `http://localhost:8080/swagger-ui/index.html`에서 볼 수 있다. 로그인 API로 받은 토큰을 우측 상단 Authorize에 넣으면 인증이 필요한 API도 호출할 수 있다.
 
@@ -179,14 +213,14 @@ CodeRabbit 리뷰는 그대로 수용하지 않고 "이번 PR에서 수정 / 다
 ## 알려진 한계
 
 - 로그아웃은 클라이언트가 토큰을 삭제하는 방식이라, 탈취된 토큰은 만료 (1시간)까지 유효하다.
-- 전화번호는 길이(13자)만 검증하고 형식은 검증하지 않는다.
-- 자동화 테스트가 없다. 현재는 Postman / curl로 검증한다.
+- 자동화 테스트는 애플리케이션 기동 확인(`contextLoads`)뿐이다. API 검증은 Postman / curl로 한다.
 
 ## 다음 단계
 
 - [x] v1 기능 완료, 안정화 (예외 응답, 입력 제약, 권한 정리, LAZY 전환)
 - [x] Swagger 문서화
-- [ ] 전화번호 형식 검증
-- [ ] MySQL 전환, 배포
+- [x] 전화번호 형식 검증
+- [x] MySQL 전환, Testcontainers 기반 테스트
+- [ ] 배포
 - [ ] LessonNote 약 20만 건 데이터 구성, Prometheus와 Grafana 관측 환경
 - [ ] 수업 종료 직후 요청이 몰리는 상황을 k6로 재현해 병목 분석, 개선, 재측정
