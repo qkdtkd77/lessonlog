@@ -194,9 +194,12 @@ API 문서는 실행 후 `http://localhost:8080/swagger-ui/index.html`에서 볼
 
 | 계정                | 비밀번호 | 역할                |
 |---------------------|----------|---------------------|
-| `teacher1@test.com` | `1234`   | TEACHER (학생 1, 2) |
-| `teacher2@test.com` | `1234`   | TEACHER (학생 3, 4) |
+| `teacher1@test.com` | `1234`   | TEACHER (학생 11명, 2페이지 분량) |
+| `teacher2@test.com` | `1234`   | TEACHER (학생 2명) |
+| `teacher3@test.com` | `1234`   | TEACHER (학생 3명) |
+| `teacher4@test.com` | `1234`   | 탈퇴한 TEACHER (로그인 차단 확인용) |
 | `admin@test.com`    | `1234`   | ADMIN               |
+| `admin2@test.com`   | `1234`   | ADMIN               |
 
 ---
 
