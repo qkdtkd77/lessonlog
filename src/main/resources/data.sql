@@ -187,17 +187,3 @@ VALUES (39, 4, '곡 후반부 합주', '후반부 반복', '필인 타이밍 주
 
 INSERT INTO lesson_note (id, student_id, lesson_content, homework, memo, lesson_date)
 VALUES (40, 4, '전체 곡 연주', '원곡과 전체 연주', '', '2026-09-05');
-
-
--- ========================================
--- H2 IDENTITY 다음 생성값 조정
--- ========================================
-
-ALTER TABLE users
-    ALTER COLUMN id RESTART WITH 4;
-
-ALTER TABLE student
-    ALTER COLUMN id RESTART WITH 5;
-
-ALTER TABLE lesson_note
-    ALTER COLUMN id RESTART WITH 41;

@@ -42,3 +42,6 @@ src/main/generated/
 
 FETCH_HEAD
 scripts/
+
+Claude outputs/
+.env
