@@ -23,7 +23,7 @@
 
 | 영역        | 기술                                                          |
 |-------------|---------------------------------------------------------------|
-| 언어 / 빌드 | Java 26, Gradle                                               |
+| 언어 / 빌드 | Java 25 (LTS), Gradle                                         |
 | 프레임워크  | Spring Boot 4.1, Spring MVC, Spring Security, Spring Data JPA |
 | 인증        | JJWT 0.13 (HS256)                                             |
 | DB          | H2 (개발용, MySQL 전환 예정)                                  |
