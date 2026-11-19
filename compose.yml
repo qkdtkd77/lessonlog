@@ -1,0 +1,17 @@
+services:
+  mysql:
+    image: mysql
+    container_name: lessonlog-mysql
+    ports:
+      - "127.0.0.1:3300:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: lessonlog
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      TZ: Asia/Seoul
+    volumes:
+      - lessonlog-mysql-data:/var/lib/mysql
+
+volumes:
+  lessonlog-mysql-data:

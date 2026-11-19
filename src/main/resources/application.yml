@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: lessonlog
+  profiles:
+    default: local
+  jpa:
+    open-in-view: false
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 3600000
