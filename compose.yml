@@ -3,7 +3,7 @@ services:
     image: mysql
     container_name: lessonlog-mysql
     ports:
-      - "3300:3306"
+      - "127.0.0.1:3300:3306"
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: lessonlog
