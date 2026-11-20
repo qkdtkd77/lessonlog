@@ -190,6 +190,24 @@ docker compose up -d
 
 테스트는 `test` 프로필로 실행되며 Testcontainers가 별도 MySQL 컨테이너를 띄웠다가 종료 후 정리한다. 로컬 MySQL을 켜 둘 필요는 없다.
 
+**5. 부하 테스트용 데이터 (선택)**
+
+선생님 1,000명, 학생 약 1만 명, 일지 약 21만 건을 별도 DB(`lessonlog_perf`)에 만든다. 스크립트는 실행할 때마다 같은 데이터를 만든다.
+
+```bash
+docker exec -i lessonlog-mysql sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD"' < perf/perf-data.sql
+./gradlew bootRun --args='--spring.profiles.active=perf'
+```
+
+`perf` 프로필은 테이블을 새로 만들지 않고 검증만 한다(`ddl-auto: validate`). 계정은 `teacher0001@perf.test` ~ `teacher1000@perf.test`, 비밀번호는 `1234`다.
+
+테스트 후 처음 상태로 되돌릴 때는 스냅샷을 쓴다.
+
+```bash
+docker exec lessonlog-mysql sh -c 'mysqldump -uroot -p"$MYSQL_ROOT_PASSWORD" --set-gtid-purged=OFF --single-transaction lessonlog_perf' > perf/snapshot.sql
+docker exec -i lessonlog-mysql sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" lessonlog_perf' < perf/snapshot.sql
+```
+
 API 문서는 실행 후 `http://localhost:8080/swagger-ui/index.html`에서 볼 수 있다. 로그인 API로 받은 토큰을 우측 상단 Authorize에 넣으면 인증이 필요한 API도 호출할 수 있다.
 
 | 계정                | 비밀번호 | 역할                |
@@ -225,5 +243,6 @@ CodeRabbit 리뷰는 그대로 수용하지 않고 "이번 PR에서 수정 / 다
 - [x] 전화번호 형식 검증
 - [x] MySQL 전환, Testcontainers 기반 테스트
 - [ ] 배포
-- [ ] LessonNote 약 20만 건 데이터 구성, Prometheus와 Grafana 관측 환경
+- [x] 부하 테스트용 데이터 구성 (일지 약 21만 건, 치우친 분포)
+- [ ] Prometheus와 Grafana 관측 환경
 - [ ] 수업 종료 직후 요청이 몰리는 상황을 k6로 재현해 병목 분석, 개선, 재측정
