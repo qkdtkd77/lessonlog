@@ -45,3 +45,4 @@ scripts/
 
 Claude outputs/
 .env
+perf/snapshot.sql
