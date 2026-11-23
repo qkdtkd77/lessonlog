@@ -5,7 +5,7 @@
 직접 레슨을 하면서 손으로 일지를 쓰는 게 불편했고, 개인 레슨에서는 결국 기록을 안 하게 된 경험에서 시작했다. 기능 구현에 그치지 않고, 설계 판단의 근거를 남기고 실제 트래픽 상황을 가정해 성능을 측정하고
 개선하는 것을 목표로 한다.
 
-**진행 상태:** v1 완료, 성능 실험 준비 중 / **문서 기준일:** 2026-11-17
+**진행 상태:** v1 완료, 성능 실험 준비 중 / **문서 기준일:** 2026-11-23
 
 ---
 
@@ -27,6 +27,7 @@
 | 프레임워크  | Spring Boot 4.1, Spring MVC, Spring Security, Spring Data JPA |
 | 인증        | JJWT 0.13 (HS256)                                             |
 | DB          | MySQL (Docker), 테스트는 Testcontainers                       |
+| 관측        | Micrometer, Prometheus, Grafana, mysqld-exporter, k6          |
 | 기타        | MapStruct, Bean Validation, Lombok                            |
 | 협업        | GitHub Issues / PR, CodeRabbit 리뷰                           |
 
@@ -163,16 +164,18 @@ cp .env.example .env
 | `DB_USERNAME`         | 애플리케이션 접속 계정                   |
 | `DB_PASSWORD`         | 애플리케이션 접속 비밀번호               |
 | `JWT_SECRET`          | JWT 서명 키 (32바이트 이상)              |
+| `MYSQL_EXPORTER_PASSWORD` | DB 지표 수집 계정 비밀번호           |
+| `GRAFANA_ADMIN_PASSWORD`  | Grafana `admin` 계정 비밀번호        |
 
 JWT 서명 키는 `openssl rand -base64 32`로 만들 수 있다.
 
-**2. MySQL 실행**
+**2. MySQL과 관측 환경 실행**
 
 ```bash
 docker compose up -d
 ```
 
-`compose.yml`이 `.env`를 읽어 MySQL을 `localhost:3300`에 띄운다.
+`compose.yml`이 `.env`를 읽어 MySQL(`localhost:3300`), Prometheus, Grafana, mysqld-exporter를 함께 띄운다.
 
 **3. 서버 실행**
 
@@ -207,6 +210,40 @@ docker exec -i lessonlog-mysql sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD"' < p
 docker exec lessonlog-mysql sh -c 'mysqldump -uroot -p"$MYSQL_ROOT_PASSWORD" --set-gtid-purged=OFF --single-transaction lessonlog_perf' > perf/snapshot.sql
 docker exec -i lessonlog-mysql sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" lessonlog_perf' < perf/snapshot.sql
 ```
+
+**6. 관측 환경 (선택)**
+
+| 도구       | 주소                    | 역할                                   |
+|------------|-------------------------|----------------------------------------|
+| Prometheus | `http://localhost:9090` | 서버와 DB 지표를 5초마다 수집          |
+| Grafana    | `http://localhost:3000` | `LessonLog 개요` 대시보드 (계정 `admin`) |
+
+대시보드는 HTTP(RPS, 오류율, p95, p99), 서버 자원(HikariCP, Tomcat 스레드, CPU, 힙, GC), MySQL(QPS, 스레드, slow query, 락 대기, 버퍼 풀) 세 구역으로 나뉜다. 데이터소스와 대시보드는 파일로 프로비저닝되어 컨테이너를 새로 띄워도 그대로 유지된다.
+
+DB 지표 수집에는 조회 권한만 가진 계정을 따로 쓴다. 처음 한 번만 만든다.
+
+```bash
+source .env
+docker exec -i lessonlog-mysql sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD"' <<SQL
+CREATE USER IF NOT EXISTS 'exporter'@'%' IDENTIFIED BY '${MYSQL_EXPORTER_PASSWORD}' WITH MAX_USER_CONNECTIONS 3;
+GRANT PROCESS, REPLICATION CLIENT, SELECT ON *.* TO 'exporter'@'%';
+SQL
+```
+
+0.1초가 넘는 쿼리는 slow query log에 남는다.
+
+```bash
+docker exec lessonlog-mysql tail -f /var/lib/mysql/slow.log
+```
+
+`perf` 프로필로 서버를 띄운 뒤 k6로 부하를 주고, 끝나면 지표를 파일로 남긴다.
+
+```bash
+docker run --rm -i -e BASE_URL=http://host.docker.internal:8080 grafana/k6 run - < perf/k6/smoke.js
+./perf/export-metrics.sh 5
+```
+
+`export-metrics.sh`는 최근 N분 지표를 `perf/results/<시각>/`에 JSON으로 저장한다.
 
 API 문서는 실행 후 `http://localhost:8080/swagger-ui/index.html`에서 볼 수 있다. 로그인 API로 받은 토큰을 우측 상단 Authorize에 넣으면 인증이 필요한 API도 호출할 수 있다.
 
@@ -244,5 +281,5 @@ CodeRabbit 리뷰는 그대로 수용하지 않고 "이번 PR에서 수정 / 다
 - [x] MySQL 전환, Testcontainers 기반 테스트
 - [ ] 배포
 - [x] 부하 테스트용 데이터 구성 (일지 약 21만 건, 치우친 분포)
-- [ ] Prometheus와 Grafana 관측 환경
+- [x] Prometheus와 Grafana 관측 환경 (서버, DB 지표)
 - [ ] 수업 종료 직후 요청이 몰리는 상황을 k6로 재현해 병목 분석, 개선, 재측정

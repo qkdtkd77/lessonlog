@@ -46,3 +46,4 @@ scripts/
 Claude outputs/
 .env
 perf/snapshot.sql
+perf/results/
