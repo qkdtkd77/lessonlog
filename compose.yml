@@ -10,8 +10,22 @@ services:
       MYSQL_USER: ${DB_USERNAME}
       MYSQL_PASSWORD: ${DB_PASSWORD}
       TZ: Asia/Seoul
+    command:
+      - --slow-query-log=ON
+      - --long-query-time=0.1
+      - --slow-query-log-file=/var/lib/mysql/slow.log
     volumes:
       - lessonlog-mysql-data:/var/lib/mysql
+  mysqld-exporter:
+    image: prom/mysqld-exporter
+    container_name: lessonlog-mysqld-exporter
+    command:
+      - --mysqld.address=mysql:3306
+      - --mysqld.username=exporter
+    environment:
+      MYSQLD_EXPORTER_PASSWORD: ${MYSQL_EXPORTER_PASSWORD}
+    depends_on:
+      - mysql
   prometheus:
     image: prom/prometheus
     container_name: lessonlog-prometheus
