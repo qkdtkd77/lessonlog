@@ -8,3 +8,18 @@ spring:
 jwt:
   secret: ${JWT_SECRET}
   expiration: 3600000
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+server:
+  tomcat:
+    mbeanregistry:
+      enabled: true

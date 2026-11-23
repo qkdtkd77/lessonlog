@@ -12,6 +12,31 @@ services:
       TZ: Asia/Seoul
     volumes:
       - lessonlog-mysql-data:/var/lib/mysql
+  prometheus:
+    image: prom/prometheus
+    container_name: lessonlog-prometheus
+    ports:
+      - "127.0.0.1:9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - lessonlog-prometheus-data:/prometheus
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  grafana:
+    image: grafana/grafana
+    container_name: lessonlog-grafana
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - lessonlog-grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
 
 volumes:
   lessonlog-mysql-data:
+  lessonlog-prometheus-data:
+  lessonlog-grafana-data:
